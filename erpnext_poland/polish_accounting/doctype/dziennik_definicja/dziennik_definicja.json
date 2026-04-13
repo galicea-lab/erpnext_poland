@@ -1,0 +1,86 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "prompt",
+ "creation": "2026-02-05 02:29:34.619719",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "kod",
+  "voucher_types",
+  "entry_types",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "kod",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Kod dziennika",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "voucher_types",
+   "fieldtype": "Table MultiSelect",
+   "label": "Dozwolone typy dokument\u00f3w \u017ar\u00f3d\u0142owych",
+   "options": "select_voucher_type"
+  },
+  {
+   "fieldname": "entry_types",
+   "fieldtype": "Table",
+   "label": "Dozwolone Entry Types (dla Journal Entry)",
+   "options": "select_entry_type"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "dziennik_definicja",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-02-18 23:15:16.379334",
+ "modified_by": "Administrator",
+ "module": "Polish Accounting",
+ "name": "dziennik_definicja",
+ "naming_rule": "Set by user",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "select": 1,
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
+   "select": 1,
+   "share": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

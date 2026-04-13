@@ -1,0 +1,140 @@
+{
+ "actions": [],
+ "autoname": "field:company_name",
+ "creation": "2026-02-02 14:16:18.966587",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_2xye",
+  "company_name",
+  "tax_id",
+  "abbr",
+  "column_break_3",
+  "phone_number",
+  "email",
+  "amended_from",
+  "contact_data_section",
+  "column_break_16",
+  "tax_office",
+  "column_break_xoox",
+  "tax_office_code"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_2xye",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "link_filters": "[]",
+   "no_copy": 1,
+   "options": "JPK Company Settings",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fetch_from": "company_name.tax_id",
+   "fieldname": "tax_id",
+   "fieldtype": "Data",
+   "label": "Tax ID",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "tax_office.code",
+   "fieldname": "tax_office_code",
+   "fieldtype": "Read Only",
+   "label": "Tax Office Code",
+   "length": 4,
+   "reqd": 1
+  },
+  {
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "label": "Contact e-mail",
+   "reqd": 1
+  },
+  {
+   "fieldname": "phone_number",
+   "fieldtype": "Data",
+   "label": "Phone Number (optional)"
+  },
+  {
+   "description": "Will be used by Tax Office",
+   "fieldname": "contact_data_section",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_16",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "company_name.abbr",
+   "fieldname": "abbr",
+   "fieldtype": "Data",
+   "label": "Abbreviation",
+   "options": "Company",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "tax_office",
+   "fieldtype": "Link",
+   "label": "Tax Office",
+   "options": "JPK Tax Office",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_xoox",
+   "fieldtype": "Column Break"
+  },
+  {
+   "bold": 1,
+   "fieldname": "company_name",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1,
+   "unique": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-04-13 16:12:45.111339",
+ "modified_by": "Administrator",
+ "module": "JPK",
+ "name": "JPK Company Settings",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "company_name"
+}

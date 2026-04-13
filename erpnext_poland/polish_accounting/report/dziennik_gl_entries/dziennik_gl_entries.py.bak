@@ -1,0 +1,129 @@
+import frappe
+from frappe import _
+
+def execute(filters=None):
+    columns = get_columns()
+    data = get_data(filters)
+    return columns, data
+
+def get_columns():
+    return [
+        {
+            "fieldname": "posting_date",
+            "label": _("Posting Date"),
+            "fieldtype": "Date",
+            "width": 100
+        },
+        {
+            "fieldname": "voucher_type",
+            "label": _("Voucher Type"),
+            "fieldtype": "Data",
+            "width": 120
+        },
+        {
+            "fieldname": "voucher_no",
+            "label": _("Voucher No"),
+            "fieldtype": "Dynamic Link",
+            "options": "voucher_type",  # To sprawia, że link jest klikalny
+            "width": 150
+        },
+        {
+            "fieldname": "account",
+            "label": _("Account"),
+            "fieldtype": "Link",
+            "options": "Account",
+            "width": 200
+        },
+        {
+            "fieldname": "party_type",
+            "label": _("Party Type"),
+            "fieldtype": "Data",
+            "width": 100
+        },
+        {
+            "fieldname": "party",
+            "label": _("Party"),
+            "fieldtype": "Dynamic Link",
+            "options": "party_type",
+            "width": 150
+        },
+        {
+            "fieldname": "debit",
+            "label": _("Debit"),
+            "fieldtype": "Currency",
+            "width": 120
+        },
+        {
+            "fieldname": "credit",
+            "label": _("Credit"),
+            "fieldtype": "Currency",
+            "width": 120
+        },
+        {
+            "fieldname": "against",
+            "label": _("Against"),
+            "fieldtype": "Data",
+            "width": 150
+        },
+        {
+            "fieldname": "remarks",
+            "label": _("Remarks"),
+            "fieldtype": "Text",
+            "width": 200
+        },
+        {
+            "fieldname": "custom_dziennik",
+            "label": _("Dziennik"),
+            "fieldtype": "Link",
+            "options": "dziennik_definicja",
+            "width": 120
+        }
+    ]
+
+def get_data(filters):
+    conditions = get_conditions(filters)
+    
+    data = frappe.db.sql(f"""
+        SELECT
+            posting_date,
+            voucher_type,
+            voucher_no,
+            account,
+            party_type,
+            party,
+            debit,
+            credit,
+            against,
+            remarks,
+            custom_dziennik
+        FROM `tabGL Entry`
+        WHERE docstatus < 2
+        {conditions}
+        ORDER BY posting_date DESC, creation DESC
+    """, filters, as_dict=1)
+    
+    return data
+
+def get_conditions(filters):
+    conditions = []
+    
+    if filters.get("company"):
+        conditions.append("company = %(company)s")
+    
+    if filters.get("from_date"):
+        conditions.append("posting_date >= %(from_date)s")
+    
+    if filters.get("to_date"):
+        conditions.append("posting_date <= %(to_date)s")
+    
+    if filters.get("custom_dziennik"):
+        conditions.append("custom_dziennik = %(custom_dziennik)s")
+    
+    if filters.get("account"):
+        conditions.append("account = %(account)s")
+    
+    if filters.get("voucher_type"):
+        conditions.append("voucher_type = %(voucher_type)s")
+    
+    return " AND " + " AND ".join(conditions) if conditions else ""
+

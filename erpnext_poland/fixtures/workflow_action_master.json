@@ -1,0 +1,44 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2026-01-15 20:09:31.109214",
+  "name": "Zarejestruj",
+  "workflow_action_name": "Zarejestruj"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2026-01-15 20:09:39.034515",
+  "name": "Przekaż",
+  "workflow_action_name": "Przekaż"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2026-01-15 20:09:54.989294",
+  "name": "Odrzuć",
+  "workflow_action_name": "Odrzuć"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2026-01-15 20:10:06.116294",
+  "name": "Do archiwum",
+  "workflow_action_name": "Do archiwum"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2026-01-15 20:10:36.966278",
+  "name": "Zatwierdź",
+  "workflow_action_name": "Zatwierdź"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2026-02-13 12:18:33.700259",
+  "name": "W koszty",
+  "workflow_action_name": "W koszty"
+ }
+]

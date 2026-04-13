@@ -1,0 +1,21 @@
+{
+ "app": "erpnext_poland",
+ "bg_color": "blue",
+ "creation": "2026-02-05 18:49:51.732517",
+ "docstatus": 0,
+ "doctype": "Desktop Icon",
+ "hidden": 0,
+ "icon": "file",
+ "icon_type": "Link",
+ "idx": 0,
+ "label": "jpk",
+ "link_to": "jpk",
+ "link_type": "Workspace Sidebar",
+ "modified": "2026-04-09 06:30:04.915896",
+ "modified_by": "Administrator",
+ "name": "jpk",
+ "owner": "Administrator",
+ "restrict_removal": 0,
+ "roles": [],
+ "standard": 1
+}

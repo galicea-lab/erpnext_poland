@@ -1,0 +1,92 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-01-15 20:07:45.154628",
+  "name": "Nowe",
+  "style": "",
+  "workflow_state_name": "Nowe"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-01-15 20:08:07.300674",
+  "name": "Zarejestrowane",
+  "style": "",
+  "workflow_state_name": "Zarejestrowane"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-01-15 20:08:21.303225",
+  "name": "Odrzucone",
+  "style": "",
+  "workflow_state_name": "Odrzucone"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-01-15 20:08:44.725616",
+  "name": "Przetwarzane",
+  "style": "",
+  "workflow_state_name": "Przetwarzane"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-01-15 20:08:55.852366",
+  "name": "Archiwum",
+  "style": "",
+  "workflow_state_name": "Archiwum"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-02-13 12:15:16.153888",
+  "name": "New",
+  "style": "",
+  "workflow_state_name": "New"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-02-13 12:16:34.147229",
+  "name": "Expenses",
+  "style": "",
+  "workflow_state_name": "Expenses"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-02-13 12:17:11.434881",
+  "name": "Receipt",
+  "style": "",
+  "workflow_state_name": "Receipt"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-02-17 08:26:45.228399",
+  "name": "Verify",
+  "style": "",
+  "workflow_state_name": "Verify"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-02-17 08:39:32.680823",
+  "name": "Submitted",
+  "style": "",
+  "workflow_state_name": "Submitted"
+ }
+]

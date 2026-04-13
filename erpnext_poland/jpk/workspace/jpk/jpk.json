@@ -1,0 +1,73 @@
+{
+ "app": "erpnext_poland",
+ "charts": [],
+ "content": "[{\"id\":\"nA3yNWlSSZ\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Dokumenty</span>\",\"col\":12}},{\"id\":\"QJDZAZSJdN\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"JPK-VAT7M\",\"col\":6}}]",
+ "creation": "2021-03-19 21:00:58.627449",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "hide_custom": 0,
+ "icon": "file",
+ "idx": 0,
+ "is_hidden": 0,
+ "label": "jpk",
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "JPK_V7M",
+   "link_count": 0,
+   "link_to": "JPK_V7M",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "JPK Tax Office Codes",
+   "link_count": 0,
+   "link_to": "JPK Tax Office",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "JPK Company Settings",
+   "link_count": 0,
+   "link_to": "JPK Company Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2026-04-09 07:25:22.738290",
+ "modified_by": "Administrator",
+ "module": "JPK",
+ "name": "jpk",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [
+  {
+   "document_type": "JPK_V7M",
+   "label": "JPK-VAT7M",
+   "quick_list_filter": "[]"
+  }
+ ],
+ "roles": [
+  {
+   "role": "All"
+  },
+  {
+   "role": "System Manager"
+  }
+ ],
+ "sequence_id": 2.0,
+ "shortcuts": [],
+ "title": "jpk",
+ "type": "Workspace"
+}

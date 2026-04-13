@@ -1,0 +1,29 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-02-05 05:59:37.071400",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "voucher_type"
+ ],
+ "fields": [
+  {
+   "fieldname": "voucher_type",
+   "fieldtype": "Link",
+   "label": "Typ dokumentu",
+   "options": "DocType",
+   "in_list_view": 1,
+   "reqd": 1
+  }
+ ],
+ "istable": 1,
+ "links": [],
+ "modified": "2026-02-05 11:51:33.001433",
+ "modified_by": "Administrator",
+ "module": "Polish Accounting",
+ "name": "select_voucher_type",
+ "owner": "Administrator",
+ "permissions": []
+}

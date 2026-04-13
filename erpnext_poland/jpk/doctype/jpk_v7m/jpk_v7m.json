@@ -1,0 +1,177 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-02-02 15:42:43.258163",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_cvu0",
+  "year",
+  "month",
+  "company",
+  "abbr",
+  "column_break_bnos",
+  "tax_id",
+  "tax_office_code",
+  "email",
+  "phone_number",
+  "column_break_8",
+  "forwarded_excess_of_input_tax",
+  "is_amendment",
+  "amended_from",
+  "amendment_reasons",
+  "consecutive_number"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_cvu0",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "JPK_V7M",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "year",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Year",
+   "length": 4,
+   "reqd": 1,
+   "set_only_once": 1
+  },
+  {
+   "fieldname": "month",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Month",
+   "length": 2,
+   "reqd": 1,
+   "set_only_once": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "JPK_V7M",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fetch_from": "company_name.abbr",
+   "fieldname": "abbr",
+   "fieldtype": "Data",
+   "label": "abbr",
+   "length": 5,
+   "reqd": 1
+  },
+  {
+   "default": "No",
+   "fieldname": "is_amendment",
+   "fieldtype": "Select",
+   "label": "Is it amendment?",
+   "options": "No\nYes",
+   "set_only_once": 1
+  },
+  {
+   "fetch_from": "company_name.tax_id",
+   "fieldname": "tax_id",
+   "fieldtype": "Read Only",
+   "label": "Tax ID"
+  },
+  {
+   "fetch_from": "company_name.tax_office_code",
+   "fieldname": "tax_office_code",
+   "fieldtype": "Read Only",
+   "label": "Tax Office Code"
+  },
+  {
+   "fetch_from": "company_name.email",
+   "fieldname": "email",
+   "fieldtype": "Read Only",
+   "label": "E-mail"
+  },
+  {
+   "fetch_from": "company_name.phone_number",
+   "fieldname": "phone_number",
+   "fieldtype": "Read Only",
+   "label": "Phone Number"
+  },
+  {
+   "fieldname": "column_break_8",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_in_quick_entry": 1,
+   "allow_on_submit": 1,
+   "bold": 1,
+   "fieldname": "forwarded_excess_of_input_tax",
+   "fieldtype": "Int",
+   "in_preview": 1,
+   "label": "Forwarded excess of input tax",
+   "length": 14
+  },
+  {
+   "fieldname": "amendment_reasons",
+   "fieldtype": "Text",
+   "label": "Amendment reasons (if any)",
+   "set_only_once": 1
+  },
+  {
+   "fieldname": "consecutive_number",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Consecutive Number"
+  },
+  {
+   "fieldname": "column_break_bnos",
+   "fieldtype": "Column Break"
+  },
+  {
+   "bold": 1,
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "JPK Company Settings",
+   "options": "JPK Company Settings",
+   "reqd": 1,
+   "set_only_once": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-04-13 15:49:48.277647",
+ "modified_by": "Administrator",
+ "module": "JPK",
+ "name": "JPK_V7M",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

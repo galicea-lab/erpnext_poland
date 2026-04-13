@@ -1,0 +1,24 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "JPK_V7M",
+  "enabled": 1,
+  "modified": "2026-02-09 22:35:50.924577",
+  "module": "JPK",
+  "name": "JPK_VAT7M_Create",
+  "script": "frappe.ui.form.on('JPK_V7M', {\n    refresh: function(frm) {\n        //if (frm.doc.docstatus === 1) {\n            frm.add_custom_button(__('Wygeneruj'), function() {\n                frappe.call({\n                    method: 'erpnext_poland.jpk_utils.create_jpk_v7m', \n                    args: { jpk_ident: frm.doc.name },\n                    callback: function(r) {\n                        if (!r.exc) {\n                            frm.reload_doc();  // odśwież, by pokazać nowy status\n                        }\n                    }\n                });\n            });\n        //}\n    }\n\n    \n})",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Sales Invoice",
+  "enabled": 1,
+  "modified": "2026-02-02 21:02:52.946253",
+  "module": "KSeF",
+  "name": "KSeF",
+  "script": "frappe.ui.form.on('Sales Invoice', {\n    refresh: function(frm) {\n        if (frm.doc.docstatus === 1 && frm.doc.ksef_status === 'Oczekuje') {  // tylko po submit, jeśli nie wysłano\n            frm.add_custom_button(__('Wyślij do KSeF'), function() {\n                frappe.call({\n                    method: 'erpnext_poland.ksef_utils.send_to_ksef',  // Twój Python method\n                    args: { invoice_name: frm.doc.name },\n                    callback: function(r) {\n                        if (!r.exc) {\n                            frm.reload_doc();  // odśwież, by pokazać nowy status\n                        }\n                    }\n                });\n            });\n        }\n    }\n});",
+  "view": "Form"
+ }
+]
