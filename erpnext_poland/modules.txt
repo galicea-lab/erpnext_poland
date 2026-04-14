@@ -1,5 +1,4 @@
 ERPNext Poland
 ksef
 jpk
-plformat
 polish_accounting

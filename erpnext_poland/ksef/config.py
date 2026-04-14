@@ -1,44 +1,33 @@
 # core/config.py
+import frappe
 
-import configparser
-import os
-from pydantic import BaseModel, field_validator
-from pydantic_settings import BaseSettings
-from frappe.utils import get_bench_path
-
-config = configparser.ConfigParser()
-ini_path = os.path.join(os.path.dirname(__file__), 'config.ini')
-config.read(ini_path)
-
-class KSeF2Settings(BaseModel):
+class KSeF2Settings():
   """Model dla sekcji [ksef2]"""
   cert_pfx: str
   cert_pass: str
   nip : str
   api_url : str
 
-
-  @field_validator('cert_pfx')
-  @classmethod
-  def resolve_cert_path(cls, v: str) -> str:
-    # ścieżka względna w stosunku do bench
-    if not os.path.isabs(v):
-      bench_path = get_bench_path()
-      return os.path.join(bench_path, v)
-    return v
+  def __init__(self, **data):
+    # Pobieranie całego dokumentu ustawień
+    settings = frappe.get_doc("Polish Accounting Settings")
+    self.nip=settings.nip
+    self.api_url=settings.api_url
+    # Hasło zostanie automatycznie odszyfrowane przez get_password
+    self.cert_pass = settings.get_password('cert_pass')
+    # settings.cert_pfx zwróci URL w postaci "/private/files/pieczec.pfx"
+    # frappe.get_site_path konwertuje to na pełną ścieżkę absolutną na serwerze!
+    if settings.cert_pfx:
+      self.cert_pfx = frappe.get_site_path(settings.cert_pfx.strip('/'))
+    else:
+      self.cert_pfx = "sites/localhost/private/files/pieczec.pfx"
 
 # --- Główna klasa ustawień, która agreguje wszystkie sekcje ---
-class Settings(BaseSettings):
+class Settings():
   ksef2: KSeF2Settings
 
-#def iniSettings():
-#  my_settings=Settings(
-#  ksef2 = KSeF2Settings(**config['ksef2']),
-#  )
-#  return my_settings
+  def __init__(self, **data):
+    self.ksef2 = KSeF2Settings()
 
+settings=Settings()
 
-# --- Logika ładowania ustawień ---
-settings = Settings(
-  ksef2 = KSeF2Settings(**config['ksef2']),
-)
