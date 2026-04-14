@@ -1,7 +1,13 @@
 ### ERPNext Poland
 
 ErpNext for Poland
+
 Details (in Polish): description.md
+
+Demo: https://erpnext.transmem.pl/
+
+login: demo/transmem
+
 
 ### Installation
 

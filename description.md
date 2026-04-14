@@ -4,6 +4,9 @@
 * KSeF
 * polish_accounting - pozostałe
 
+Podręcznik:
+https://erpnext.transmem.pl/doc/
+
 ## JPK
 
 Zaimplementowano JPK_V7M
