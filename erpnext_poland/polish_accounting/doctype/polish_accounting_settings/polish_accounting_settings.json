@@ -10,7 +10,10 @@
   "cert_pass",
   "api_url",
   "nip",
-  "test_api_url"
+  "test_api_url",
+  "credit_to_usd",
+  "item_code",
+  "description"
  ],
  "fields": [
   {
@@ -25,7 +28,7 @@
   },
   {
    "fieldname": "cert_pass",
-   "fieldtype": "Data",
+   "fieldtype": "Password",
    "label": "cert_pass"
   },
   {
@@ -42,13 +45,31 @@
    "fieldname": "test_api_url",
    "fieldtype": "Data",
    "label": "test_api_url"
+  },
+  {
+   "description": "Konto zobowi\u0105za\u0144 w USD",
+   "fieldname": "credit_to_usd",
+   "fieldtype": "Data",
+   "label": "credit_to_usd"
+  },
+  {
+   "description": "Kod asortymentu",
+   "fieldname": "item_code",
+   "fieldtype": "Data",
+   "label": "item_code"
+  },
+  {
+   "description": "Opis",
+   "fieldname": "description",
+   "fieldtype": "Data",
+   "label": "description"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2026-04-13 15:10:48.414661",
+ "modified": "2026-04-15 12:55:19.488704",
  "modified_by": "Administrator",
  "module": "Polish Accounting",
  "name": "Polish Accounting Settings",

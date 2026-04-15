@@ -156,7 +156,7 @@ class JPK_V7M_Generator:
   def _get_podmiot(self) -> Podmiot1:
     """Utwórz sekcję Podmiot1 na podstawie danych firmy"""
     # Sprawdź czy firma ma NIP (osoba niefizyczna) czy PESEL (osoba fizyczna)
-    if self.company_data.get("pesel"): # !! do zrobienia - na razie tylko nifizyczne
+    if self.company_data.get("pesel"): # !! do zrobienia - na razie tylko niefizyczne
       # Osoba fizyczna (domyślnie - należy dostosować do rzeczywistych danych)
       osoba_fizyczna = OsobaFizyczna(
         nip=self.company_data.get("tax_id", "").strip(),
@@ -231,9 +231,11 @@ class JPK_V7M_Generator:
       if tax_id and tax_id[0].isalpha():
         TIN=tax_id[:2]
         tax_id=tax_id[2:]
-      if tax_id=='EU528002224': # !!! poprawic
+      """
+      if tax_id=='EU528002224': # ???
         tax_id='528002224'
         TIN='USA'
+      """
 
       sprzedaz_wiersz = SprzedazWiersz(
         lp_sprzedazy=idx,

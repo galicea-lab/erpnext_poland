@@ -1,6 +1,7 @@
 import frappe
 from lxml import etree  as ET
 
+from erpnext_poland.ksef.config import get_accounting_settings
 from frappe.utils.file_manager import save_file
 
 
@@ -46,7 +47,7 @@ def import_ksef_header(xml_content, metadata):
 
 @frappe.whitelist()
 def send_to_ksef(invoice_name):
-    from .ksef.config import settings
+    settings = get_accounting_settings()
     # Pobierz dane faktury
     invoice = frappe.get_doc("Sales Invoice", invoice_name)
     from .ksef.create_fa3 import generate_ksef_xml
@@ -110,6 +111,7 @@ def map_item(item):
 def register_from_ksef():
   from .ksef.ksef2int import ksef2_receive_invoices #ksef2_receive_invoices_test
   from .utils.dbint import get_or_create_supplier_by_nip
+  settings = get_accounting_settings()
 
   #for ksefID in ksef2_receive_invoices_test():
   for ksefID in ksef2_receive_invoices():
@@ -136,13 +138,13 @@ def register_from_ksef():
             "currency": ksef_data['currency'],
             "total_amount": ksef_data['total_amount'],
             "ksef_numer": ksefID,
-            "credit_to": '210.01.2 - Rozrachunki z dostawcami krajowymi - USD - TM', #!!!!
+            "credit_to": settings.credit_to_usd, #'210.01.2 - Rozrachunki z dostawcami krajowymi - USD - TM', #!!!!
             # "items": []
             "items": [{
-              "item_code": "KSeF-PENDING",  # Specjalny przedmiot techniczny
+              "item_code": settings.item_code,  # Specjalny przedmiot techniczny
               "qty": 1,
               "rate": ksef_data['total_amount'],
-              "description": "Faktura oczekująca na kategoryzację"
+              "description": settings.description
             }]
           })
         else:
@@ -156,10 +158,10 @@ def register_from_ksef():
           "ksef_numer": ksefID,
           #"items": []
           "items": [{
-            "item_code": "KSeF-PENDING",  # Specjalny przedmiot techniczny
+            "item_code": settings.item_code,  # Specjalny przedmiot techniczny
             "qty": 1,
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               "rate": ksef_data['total_amount'],
-            "description": "Faktura oczekująca na kategoryzację"
+            "description": settings.description
           }]
         })
         # Dodawanie pozycji faktury

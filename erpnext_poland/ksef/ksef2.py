@@ -14,7 +14,7 @@ from ksef2client.client import KSeFClient
 from ksef2client.auth_utils import create_auth_request_xml2
 from ksef2client.signing import sign_auth_request_with_xmlsec as sign_xades2
 
-from config import settings
+from .config import get_accounting_settings
 
 def authenticate_with_certificate_ksef2(ksef_client: KSeFClient, certificate_path: str, password: str, nip: str):
     # Funkcja uwierzytelniania certyfikatem w KSeF 2.0.
@@ -39,7 +39,7 @@ def authenticate_with_certificate_ksef2(ksef_client: KSeFClient, certificate_pat
         print("3. Inicjowanie uwierzytelniania podpisem...")
         init_response = ksef_client.auth_by_xades_signature(signed_xml)
         print(f"   Numer referencyjny operacji: {init_response.referenceNumber}")
-        
+
         temp_auth_token = init_response.authenticationToken.token
 
         # Sprawdzaj status operacji, aż do uzyskania statusu 200
@@ -52,17 +52,17 @@ def authenticate_with_certificate_ksef2(ksef_client: KSeFClient, certificate_pat
             elif status_response.status.code >= 400:
                 print(f"Uwierzytelnienie nie powiodło się. Powód: {status_response.status.description}")
                 return None
-            
+
             time.sleep(2)
 
         # Tokeny dostępowe
         print("5. Uwierzytelnianie zakończone. Pobranie tokenów sesji...")
         tokens = ksef_client.redeem_token(temp_auth_token)
-        
+
         # Ustaw główny token dostępu w kliencie
         ksef_client.set_access_token(tokens.accessToken.token)
         print("Tokeny pobrane.")
-        
+
         return tokens
 
     except requests.exceptions.HTTPError as e:
@@ -99,24 +99,24 @@ def ksef2_open_online_session(ksef_client: KSeFClient, public_key_pem: str) -> t
 
     symmetric_key = get_random_bytes(32)
     iv = get_random_bytes(16)
-    
+
     encryption_info = create_encryption_info(symmetric_key, public_key_pem, iv)
-    
+
     session_request = OpenOnlineSessionRequest(
         formCode=FormCode(systemCode="FA (2)", schemaVersion="1-0E", value="FA"),
         encryption=encryption_info
     )
-    
+
     # Wywołanie klienta w celu otwarcia sesji
     session_response = ksef_client.online_session_open(session_request)
-    
+
     # Zwracamy odpowiedź serwera oraz klucz i IV do późniejszego użycia
     return session_response, symmetric_key, iv
 
 def ksef2_send_invoice_in_session(ksef_client: KSeFClient, session_ref: str, invoice_data: bytes, symmetric_key: bytes, iv: bytes):
     # Szyfruje i wysyła fakturę w ramach już otwartej sesji, używając podanego klucza.
      # Używa klucza i IV z otwartej sesji
-    
+
     # Szyfrowanie faktury z użyciem klucza sesji
     encrypted_content, _, _ = prepare_invoice_for_sending(invoice_data, symmetric_key, iv)
 
@@ -127,7 +127,7 @@ def ksef2_send_invoice_in_session(ksef_client: KSeFClient, session_ref: str, inv
         encryption_info=None, # Nie jest wymagane przy wysyłce faktury
         offline_mode=False
     )
-    
+
     return ksef_client.online_session_send_invoice(session_ref, send_request)
 
 ### odbiór
@@ -152,7 +152,7 @@ from ksef2client.client import KSeFClient
 from ksef2client.auth_utils import create_auth_request_xml2
 from ksef2client.signing import sign_auth_request_with_xmlsec as sign_xades2
 
-from config import settings
+from .config import get_accounting_settings
 
 
 # --- FUNKCJE POMOCNICZE (BEZ ZMIAN) ---
@@ -310,9 +310,9 @@ def download_invoice_xml(ksef_client: KSeFClient, ksef_number: str, output_dir: 
 
 ###############################################
 def test_send_invoice_flow(nip: str, invoice_path: str, certificate_path : str, password: str):
-   # przepływ uwierzytelniania i wysyłki faktury.
+    settings = get_accounting_settings()
     ksef = KSeFClient(base_url=settings.ksef2.api_url)
-    
+
     print("--- Krok 1: Uwierzytelnianie ---")
     tokens = authenticate_with_certificate_ksef2(
         ksef,
@@ -322,7 +322,7 @@ def test_send_invoice_flow(nip: str, invoice_path: str, certificate_path : str, 
     )
     if not tokens:
         return
-    
+
     print("\n--- Krok 2: Pobieranie klucza publicznego MF ---")
     try:
         public_key = get_mf_public_key(ksef, "SymmetricKeyEncryption")
@@ -341,7 +341,7 @@ def test_send_invoice_flow(nip: str, invoice_path: str, certificate_path : str, 
         print("\n--- Krok 4: Wysyłanie faktury ---")
         with open(invoice_path, "rb") as f:
             invoice_data = f.read()
-        
+
         send_response = ksef2_send_invoice_in_session(ksef, session_ref, invoice_data, sym_key, iv)
         print(f"   Faktura wysłana, numer referencyjny faktury: {send_response.referenceNumber}")
 
@@ -369,6 +369,7 @@ def sign_auth_file(ksef_client: KSeFClient, certificate_path: str, password: str
         return None
 
 if __name__ == "__main__":
+    settings = get_accounting_settings()
     parser = argparse.ArgumentParser(description='Testowanie klienta KSeF 2.0')
     parser.add_argument('cmd', choices=['login', 'send', 'inbox', 'download', 'sign'], help='Operacja do wykonania.')
     parser.add_argument('--nip', help='NIP podatnika (wymagany przy login/inbox).', default=settings.ksef2.nip)
@@ -418,6 +419,5 @@ if __name__ == "__main__":
                 ksef_client.revoke_current_session()
             except:
                 pass
-
     else:
         parser.print_help()

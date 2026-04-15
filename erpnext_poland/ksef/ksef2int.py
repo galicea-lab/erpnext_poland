@@ -20,7 +20,7 @@ from .ksef2client.client import KSeFClient
 from .ksef2client.auth_utils import create_auth_request_xml2
 from .ksef2client.signing import sign_auth_request_with_xmlsec as sign_xades2
 
-from .config import settings
+from .config import get_accounting_settings
 
 
 def authenticate_with_certificate_ksef2(ksef_client: KSeFClient, certificate_path: str, password: str, nip: str):
@@ -268,7 +268,6 @@ def list_incoming_invoices(ksef_client: KSeFClient, days_back: int = 30):
 
 def download_invoice_xml(ksef_client: KSeFClient, ksef_number: str, output_dir: str = "."):
     """Pobiera XML faktury i zapisuje na dysku."""
-    #ksef = KSeFClient(base_url=settings.ksef2.api_url)
     try:
         # Wymaga dodania metody get_invoice_content w client.py!
         xml_content = ksef_client.get_invoice_content(ksef_number)
@@ -286,34 +285,35 @@ def ksef2_receive_invoices_test():
     yield ident
 
 def ksef2_receive_invoices():
-    ksef = KSeFClient(base_url=settings.ksef2.api_url)
-    tokens = authenticate_with_certificate_ksef2(
-        ksef,
-        nip=settings.ksef2.nip,
-        certificate_path=settings.ksef2.cert_pfx,
-        password=settings.ksef2.cert_pass
-    )
-    if not tokens:
-        return ""
-    try:
-        public_key = get_mf_public_key(ksef, "SymmetricKeyEncryption")
-    except Exception as e:
-        print(f"   Błąd pobierania klucza: {e}")
-        return ""
-    session_ref = None
-    try:
-        session_response, sym_key, iv = ksef2_open_online_session(ksef, public_key)
-        session_ref = session_response.referenceNumber
-        ilist = list_incoming_invoices(ksef, days_back=30)
-        for inv in ilist:
-            download_invoice_xml(ksef, ksef_number=inv.ksefNumber)
-            yield inv.ksefNumber
-    except Exception as e:
-        print(f"   Wystąpił błąd podczas wysyłki: {e}")
-        return ""
-    finally:
-        if session_ref:
-            ksef.online_session_terminate(session_ref)
+  settings = get_accounting_settings()
+  ksef = KSeFClient(base_url=settings.ksef2.api_url)
+  tokens = authenticate_with_certificate_ksef2(
+      ksef,
+      nip=settings.ksef2.nip,
+      certificate_path=settings.ksef2.cert_pfx,
+      password=settings.ksef2.cert_pass
+  )
+  if not tokens:
+    return ""
+  try:
+    public_key = get_mf_public_key(ksef, "SymmetricKeyEncryption")
+  except Exception as e:
+    print(f"   Błąd pobierania klucza: {e}")
+    return ""
+  session_ref = None
+  try:
+    session_response, sym_key, iv = ksef2_open_online_session(ksef, public_key)
+    session_ref = session_response.referenceNumber
+    ilist = list_incoming_invoices(ksef, days_back=30)
+    for inv in ilist:
+      download_invoice_xml(ksef, ksef_number=inv.ksefNumber)
+      yield inv.ksefNumber
+  except Exception as e:
+    print(f"   Wystąpił błąd podczas wysyłki: {e}")
+    return ""
+  finally:
+    if session_ref:
+      ksef.online_session_terminate(session_ref)
 
 ###############################################
 def ksef2_send_invoice(invoice_data : str, nip: str, certificate_path : str, password: str):

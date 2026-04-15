@@ -1,33 +1,44 @@
 # core/config.py
+from dataclasses import dataclass
 import frappe
 
-class KSeF2Settings():
-  """Model dla sekcji [ksef2]"""
-  cert_pfx: str
-  cert_pass: str
-  nip : str
-  api_url : str
 
-  def __init__(self, **data):
-    # Pobieranie całego dokumentu ustawień
-    settings = frappe.get_doc("Polish Accounting Settings")
-    self.nip=settings.nip
-    self.api_url=settings.api_url
-    # Hasło zostanie automatycznie odszyfrowane przez get_password
-    self.cert_pass = settings.get_password('cert_pass')
-    # settings.cert_pfx zwróci URL w postaci "/private/files/pieczec.pfx"
-    # frappe.get_site_path konwertuje to na pełną ścieżkę absolutną na serwerze!
-    if settings.cert_pfx:
-      self.cert_pfx = frappe.get_site_path(settings.cert_pfx.strip('/'))
-    else:
-      self.cert_pfx = "sites/localhost/private/files/pieczec.pfx"
+# 1. Czysta struktura danych (zastępuje Pydantic)
+@dataclass
+class KSeF2Settings:
+	cert_pfx: str
+	cert_pass: str
+	nip: str
+	api_url: str
+	credit_to_usd:str
+	item_code : str
+	description : str
 
-# --- Główna klasa ustawień, która agreguje wszystkie sekcje ---
-class Settings():
-  ksef2: KSeF2Settings
+@dataclass
+class Settings:
+	ksef2: KSeF2Settings
 
-  def __init__(self, **data):
-    self.ksef2 = KSeF2Settings()
 
-settings=Settings()
+# 2. Fabryka do budowania ustawień Z kontekstu Frappe
+def get_accounting_settings() -> Settings:
+	"""Pobiera i parsuje ustawienia KSeF z bazy danych Frappe"""
+
+	# get_doc wywołujemy TYLKO wewnątrz funkcji/metod, nigdy globalnie
+	ksef_doc = frappe.get_doc("Polish Accounting Settings")
+
+	cert_pfx_path = ""
+	if ksef_doc.cert_pfx:
+		cert_pfx_path = frappe.get_site_path(ksef_doc.cert_pfx.strip('/'))
+
+	ksef_settings = KSeF2Settings(
+		nip=ksef_doc.nip,
+		api_url=ksef_doc.api_url,
+		cert_pass=ksef_doc.get_password('cert_pass'),
+		cert_pfx=cert_pfx_path,
+		credit_to_usd=ksef_doc.credit_to_usd,
+	    item_code = ksef_doc.item_code,
+	    description = ksef_doc.description
+	)
+
+	return Settings(ksef2=ksef_settings)
 
