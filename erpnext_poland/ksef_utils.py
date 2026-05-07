@@ -66,14 +66,15 @@ def send_to_ksef(invoice_name):
         frappe.throw("Błąd wysyłki")
 
 
-def parse_ksef_xml(xml_content):
+def parse_ksef_xml_bak(xml_content):
   root = ET.fromstring(xml_content)
 
-  # Definicja przestrzeni nazw (dla schematu FA(2))
+  # Definicja przestrzeni nazw (dla schematu FA(3))
   ns = {
     'ns': 'http://crd.gov.pl/wzor/2025/06/25/13775/',  # Przestrzeń główna
     'ter': 'http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/01/05/eD/DefinicjeTypy/'
   }
+
 
   # Funkcja pomocnicza do pobierania tekstu z uwzględnieniem namespace
   def get_val(path):
@@ -94,14 +95,67 @@ def parse_ksef_xml(xml_content):
 
   # Pobieranie pozycji (tylko jeśli chcesz je od razu, np. do sumowania)
   for wiersz in root.findall(".//ns:Fa/ns:FaWiersz", ns):
+    try:
+      vat_rate=wiersz.find("ns:P_12", ns).text  # np. "23"
+    except:
+      vat_rate='23'
     ksef_data["items"].append({
       "description": wiersz.find("ns:P_7", ns).text if wiersz.find("ns:P_7",
                                                                    ns) is not None else "Brak opisu",
       "qty": float(wiersz.find("ns:P_8B", ns).text or 1) if wiersz.find("ns:P_8B",
                                                                         ns) is not None else 1,
       "net_rate": float(wiersz.find("ns:P_9A", ns).text or 0),
-      "vat_rate": wiersz.find("ns:P_12", ns).text  # np. "23"
+      "vat_rate":vat_rate
     })
+  return ksef_data
+
+
+import xml.etree.ElementTree as ET
+
+
+def parse_ksef_xml(xml_content):
+  root = ET.fromstring(xml_content)
+
+  # Definicja przestrzeni nazw (schemat FA(3))
+  ns = {
+    'ns': 'http://crd.gov.pl/wzor/2025/06/25/13775/',
+    'ter': 'http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/01/05/eD/DefinicjeTypy/'
+  }
+
+  # Bezpieczna funkcja pomocnicza: pobiera tekst z dowolnego elementu nadrzędnego
+  def get_val(element, path, default=None):
+    node = element.find(path, ns)
+    if node is not None and node.text is not None:
+      return node.text
+    return default
+
+  # Mapowanie nagłówka faktury (szukamy względem root)
+  ksef_data = {
+    "ksef_number": get_val(root, ".//ns:NumerKSeF"),
+    "bill_no": get_val(root, ".//ns:Fa/ns:P_2"),
+    "posting_date": get_val(root, ".//ns:Fa/ns:P_1"),
+    "currency": get_val(root, ".//ns:Fa/ns:KodWaluty", "PLN"),  # Domyślnie PLN
+    "total_amount": float(get_val(root, ".//ns:Fa/ns:P_15", 0)),
+    "supplier_nip": get_val(root, ".//ns:Podmiot1/ns:DaneIdentyfikacyjne/ns:NIP"),
+    "supplier": get_val(root, ".//ns:Podmiot1/ns:DaneIdentyfikacyjne/ns:Nazwa"),
+    "items": []
+  }
+
+  # Pobieranie pozycji faktury
+  for wiersz in root.findall(".//ns:Fa/ns:FaWiersz", ns):
+    # W KSeF cena jednostkowa może być w P_9A (netto) lub P_9B (np. brutto/marża)
+    net_rate_str = get_val(wiersz, "ns:P_9A")
+    if net_rate_str is None:
+      # Jeśli nie ma P_9A (netto), awaryjnie pobieramy P_9B
+      net_rate_str = get_val(wiersz, "ns:P_9B", 0)
+
+    ksef_data["items"].append({
+      "description": get_val(wiersz, "ns:P_7", "Brak opisu"),
+      "qty": float(get_val(wiersz, "ns:P_8B", 1)),
+      "net_rate": float(net_rate_str),
+      "vat_rate": get_val(wiersz, "ns:P_12", "23")  # Pobiera VAT, brak rzuci domyślne '23'
+    })
+
   return ksef_data
 
 def map_item(item):
@@ -138,13 +192,13 @@ def register_from_ksef():
             "currency": ksef_data['currency'],
             "total_amount": ksef_data['total_amount'],
             "ksef_numer": ksefID,
-            "credit_to": settings.credit_to_usd, #'210.01.2 - Rozrachunki z dostawcami krajowymi - USD - TM', #!!!!
+            "credit_to": settings.ksef2.credit_to_usd, #'210.01.2 - Rozrachunki z dostawcami krajowymi - USD - TM', #!!!!
             # "items": []
             "items": [{
-              "item_code": settings.item_code,  # Specjalny przedmiot techniczny
+              "item_code": settings.ksef2.item_code,  # Specjalny przedmiot techniczny
               "qty": 1,
               "rate": ksef_data['total_amount'],
-              "description": settings.description
+              "description": settings.ksef2.description
             }]
           })
         else:
@@ -158,10 +212,10 @@ def register_from_ksef():
           "ksef_numer": ksefID,
           #"items": []
           "items": [{
-            "item_code": settings.item_code,  # Specjalny przedmiot techniczny
+            "item_code": settings.ksef2.item_code,  # Specjalny przedmiot techniczny
             "qty": 1,
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               "rate": ksef_data['total_amount'],
-            "description": settings.description
+            "description": settings.ksef2.description
           }]
         })
         # Dodawanie pozycji faktury
