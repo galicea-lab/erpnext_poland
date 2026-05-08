@@ -198,7 +198,8 @@ def register_from_ksef():
               "item_code": settings.ksef2.item_code,  # Specjalny przedmiot techniczny
               "qty": 1,
               "rate": ksef_data['total_amount'],
-              "description": settings.ksef2.description
+              "description": settings.ksef2.description,
+              "expense_account": default_expense_account
             }]
           })
         else:

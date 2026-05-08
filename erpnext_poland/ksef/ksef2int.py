@@ -317,6 +317,7 @@ def ksef2_receive_invoices():
 
 ###############################################
 def ksef2_send_invoice(invoice_data : str, nip: str, certificate_path : str, password: str):
+    settings = get_accounting_settings()
     ksef = KSeFClient(base_url=settings.ksef2.api_url)
     tokens = authenticate_with_certificate_ksef2(
         ksef,
@@ -346,6 +347,7 @@ def ksef2_send_invoice(invoice_data : str, nip: str, certificate_path : str, pas
 
 
 def ksef2_get_nr(token, ksef_reference_nr) ->(SessionInvoicesResponse,str):
+  settings = get_accounting_settings()
   ksef = KSeFClient(base_url=settings.ksef2.api_url)
   if not token:
     tokens = authenticate_with_certificate_ksef2(

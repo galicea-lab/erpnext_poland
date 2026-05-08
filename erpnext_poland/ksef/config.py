@@ -1,4 +1,4 @@
-# core/config.py
+# cksef/config.py
 from dataclasses import dataclass
 import frappe
 
