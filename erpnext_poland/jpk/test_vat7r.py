@@ -54,7 +54,7 @@ def jpkv7n_prepare():
     xml_str = frappe.call('erpnext_poland.jpk.generator.generate_vat7m.export_jpk_to_xml',
                          company=company_name,
                          year=2026,
-                         month=3,
+                         month=4,
                          przeniesienie=0)
     #xml_str=test_generation(company_name)
     f=open('text.xml','w') #'wb')

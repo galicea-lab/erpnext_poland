@@ -302,7 +302,7 @@ class JPK_V7M_Generator:
         nr_dostawcy=tax_id,
         ksef_numer=invoice.get("ksef_numer") or '',
         nazwa_dostawcy=invoice.get("supplier_name") or invoice.get("supplier"),
-        dowod_zakupu=invoice["bill_no"],
+        dowod_zakupu=invoice["bill_no"] or '',
         data_zakupu=invoice.get("ksef_data_sprzedazy") or invoice.get("bill_date") or invoice["posting_date"],
         k_42=k_42,
         k_43=k_43
