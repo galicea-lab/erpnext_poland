@@ -11,7 +11,7 @@ SITE_NAME = "localhost"
 os.chdir(BENCH_PATH)
 
 
-def ksef2send(invoice_name='FV/2026/01/00001'):
+def ksef2send(invoice_name='FV/2026/07/00001'):
   try:
     from erpnext_poland.ksef_utils import  send_to_ksef
     send_to_ksef(invoice_name)
@@ -46,8 +46,8 @@ if __name__=="__main__":
     finally:
         os.chdir(original_cwd)
     if choice=='send':
-      #ksef2send(invoice_name='FV/2026/03/00002')
-      ksef_prepare(invoice_name='FV/2026/07/00001')
+      ksef2send(invoice_name='FV/2026/07/00001')
+#      ksef_prepare(invoice_name='FV/2026/07/00001')
     elif choice=='receive':
       #register_from_ksef()
       frappe.call('erpnext_poland.ksef_utils.register_from_ksef')
@@ -61,5 +61,4 @@ if __name__=="__main__":
     print(e)
   finally:
     frappe.destroy()
-
 
