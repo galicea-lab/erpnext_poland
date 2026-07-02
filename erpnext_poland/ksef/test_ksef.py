@@ -18,7 +18,7 @@ def ksef2send(invoice_name='FV/2026/01/00001'):
   except Exception as e:
   	print(e)
 
-def ksef_prepare(invoice_name='FV/2026/02/00001'):
+def ksef_prepare(invoice_name='FV/2026/07/00001'):
   try:
     from erpnext_poland.ksef.create_fa3 import generate_ksef_xml
     invoice = frappe.get_doc("Sales Invoice", invoice_name)
@@ -46,7 +46,8 @@ if __name__=="__main__":
     finally:
         os.chdir(original_cwd)
     if choice=='send':
-      ksef2send(invoice_name='FV/2026/03/00002')
+      #ksef2send(invoice_name='FV/2026/03/00002')
+      ksef_prepare(invoice_name='FV/2026/07/00001')
     elif choice=='receive':
       #register_from_ksef()
       frappe.call('erpnext_poland.ksef_utils.register_from_ksef')

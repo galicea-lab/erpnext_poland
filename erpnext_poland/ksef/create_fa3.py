@@ -1,6 +1,8 @@
 # https://gemini.google.com/app/18b315f613e6ba7f
 import frappe
 from lxml import etree as et
+
+from erpnext.accounts.doctype.payment_request.test_payment_request import payment_method
 from frappe.utils import flt, formatdate, strip_html,now_datetime
 
 
@@ -187,5 +189,44 @@ def generate_ksef_xml(invoice_name):
         et.SubElement(wiersz, "P_9A").text = f"{flt(item.rate):.2f}"
         et.SubElement(wiersz, "P_11").text = f"{flt(item.net_amount):.2f}"
         et.SubElement(wiersz, "P_12").text = "23"
+    payments=doc.get('payment_schedule')
+    if payments:
+      try:
+        payment=payments[0]
+        due_date=payment.due_date # creation+credit_days
+        if payment.mode_of_payment=='Wire Transfer':
+          tryb_platnosci='6'# przelew
+        company = frappe.get_doc("Company", doc.company)
+
+        bank_accounts = frappe.get_all(
+          "Bank Account",
+          filters={"account": company.default_bank_account},
+          fields=["name", "bank_account_no", "iban"],
+          limit=1
+        )
+
+        if bank_accounts:
+          iban = bank_accounts[0].get("iban") or bank_accounts[0].get("bank_account_no")
+
+      except:
+        pass
+      if (due_date and iban and tryb_platnosci):
+        platnosc = et.SubElement(fa, "Platnosc")
+        termin = et.SubElement(platnosc, "TerminPlatnosci")
+        et.SubElement(termin, "Termin").text = due_date.isoformat()
+        et.SubElement(platnosc, 'FormaPlatnosci').text=tryb_platnosci
+        termin = et.SubElement(platnosc, "RachunekBankowy")
+        et.SubElement(termin, "NrRB").text = iban
+
+    # Płatność
+    """<Platnosc>
+    <TerminPlatnosci>
+        <Termin>2026-07-16</Termin>
+    </TerminPlatnosci>
+    <FormaPlatnosci>6</FormaPlatnosci>
+    <RachunekBankowy>
+        <NrRB>PL12345678901234567890123456</NrRB>
+    </RachunekBankowy>
+</Platnosc>"""
 
     return et.tostring(root, encoding='UTF-8', xml_declaration=True, pretty_print=True)
