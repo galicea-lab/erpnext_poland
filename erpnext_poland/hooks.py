@@ -20,6 +20,9 @@ scheduler_events = {
     "cron": {
         "*/30 * * * *": [
             "erpnext_poland.ksef_utils.check_sent_invoices_status"
+        ],
+        "20 13 * * *": [
+            "erpnext_poland.api.nbp.synchronizuj_kursy"
         ]
     },
     "daily": [

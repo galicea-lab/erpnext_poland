@@ -13,7 +13,8 @@
   "test_api_url",
   "credit_to_usd",
   "item_code",
-  "description"
+  "description",
+  "default_expense_account"
  ],
  "fields": [
   {
@@ -45,6 +46,11 @@
    "fieldname": "test_api_url",
    "fieldtype": "Data",
    "label": "test_api_url"
+  },
+  {
+   "fieldname": "default_expense_account",
+   "fieldtype": "Data",
+   "label": "default_expense_account"
   },
   {
    "description": "Konto zobowi\u0105za\u0144 w USD",
