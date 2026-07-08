@@ -13,6 +13,7 @@ class KSeF2Settings:
 	credit_to_usd:str
 	item_code : str
 	description : str
+	default_expense_account : str
 
 @dataclass
 class Settings:
@@ -36,8 +37,9 @@ def get_accounting_settings() -> Settings:
 		cert_pass=ksef_doc.get_password('cert_pass'),
 		cert_pfx=cert_pfx_path,
 		credit_to_usd=ksef_doc.credit_to_usd,
-	    item_code = ksef_doc.item_code,
-	    description = ksef_doc.description
+	  item_code = ksef_doc.item_code,
+	  description = ksef_doc.description,
+		default_expense_account = ksef_doc.default_expense_account
 	)
 
 	return Settings(ksef2=ksef_settings)

@@ -199,7 +199,7 @@ def register_from_ksef():
               "qty": 1,
               "rate": ksef_data['total_amount'],
               "description": settings.ksef2.description,
-              "expense_account": default_expense_account
+              "expense_account": settings.ksef2.default_expense_account
             }]
           })
         else:
