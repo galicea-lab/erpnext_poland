@@ -2,7 +2,7 @@
 import frappe
 from lxml import etree as et
 
-from erpnext.accounts.doctype.payment_request.test_payment_request import payment_method
+#from erpnext.accounts.doctype.payment_request.test_payment_request import payment_method
 from frappe.utils import flt, formatdate, strip_html,now_datetime
 
 
@@ -196,6 +196,8 @@ def generate_ksef_xml(invoice_name):
         due_date=payment.due_date # creation+credit_days
         if payment.mode_of_payment=='Wire Transfer':
           tryb_platnosci='6'# przelew
+        else:
+          tryb_platnosci = '6'  # inne na razie nie obsługiwane
         company = frappe.get_doc("Company", doc.company)
 
         bank_accounts = frappe.get_all(
