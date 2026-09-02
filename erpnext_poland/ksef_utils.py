@@ -208,7 +208,7 @@ def get_or_create_item_from_description(description):
       i += 1
     item_code = f"{item_code}-{i}"
 
-  item_group = frappe.db.get_single_value("Stock Settings", "default_item_group") \
+  item_group = frappe.db.get_single_value("Stock Settings", "item_group") \
       or frappe.db.get_value("Item Group", {}, "name")
   if not item_group:
     frappe.throw("Nie można utworzyć asortymentu: brak grupy asortymentowej (Item Group). "
