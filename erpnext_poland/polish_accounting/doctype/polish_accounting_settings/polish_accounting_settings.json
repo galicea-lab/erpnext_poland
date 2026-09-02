@@ -5,17 +5,17 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "section_break_9ew0",
-  "cert_pfx",
-  "cert_pass",
-  "api_url",
-  "nip",
-  "test_api_url",
-  "credit_to_usd",
-  "item_code",
-  "description",
-  "default_expense_account"
- ],
+   "section_break_9ew0",
+   "cert_pfx",
+   "cert_pass",
+   "api_url",
+   "nip",
+   "test_api_url",
+   "credit_to_usd",
+   "item_code",
+   "description",
+   "ksef_items_mode"
+  ],
  "fields": [
   {
    "fieldname": "section_break_9ew0",
@@ -48,11 +48,6 @@
    "label": "test_api_url"
   },
   {
-   "fieldname": "default_expense_account",
-   "fieldtype": "Data",
-   "label": "default_expense_account"
-  },
-  {
    "description": "Konto zobowi\u0105za\u0144 w USD",
    "fieldname": "credit_to_usd",
    "fieldtype": "Data",
@@ -69,6 +64,14 @@
    "fieldname": "description",
    "fieldtype": "Data",
    "label": "description"
+  },
+  {
+   "default": "KSeF-PENDING",
+   "description": "Spos\u00f3b wype\u0142niania pozycji faktury zakupu importowanej z KSeF",
+   "fieldname": "ksef_items_mode",
+   "fieldtype": "Select",
+   "label": "\u0179r\u00f3d\u0142o pozycji faktury zakupu",
+   "options": "KSeF-PENDING\nPoprzednia faktura dostawcy\nPozycje z formularza KSeF"
   }
  ],
  "grid_page_length": 50,

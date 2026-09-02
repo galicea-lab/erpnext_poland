@@ -13,6 +13,9 @@ os.chdir(BENCH_PATH)
 
 def ksef2send(invoice_name='FV/2026/07/00001'):
   try:
+    company_name = frappe.defaults.get_user_default("Company")
+    print(f"Pobrano firmę: {company_name}")
+    company = frappe.get_doc("Company", company_name)
     from erpnext_poland.ksef_utils import  send_to_ksef
     send_to_ksef(invoice_name)
   except Exception as e:
@@ -46,7 +49,7 @@ if __name__=="__main__":
     finally:
         os.chdir(original_cwd)
     if choice=='send':
-      ksef2send(invoice_name='FV/2026/07/00001')
+      ksef2send(invoice_name='FV/2026/07/00002')
 #      ksef_prepare(invoice_name='FV/2026/07/00001')
     elif choice=='receive':
       #register_from_ksef()
@@ -56,7 +59,7 @@ if __name__=="__main__":
       from erpnext_poland.ksef_utils import check_sent_invoices_status
       check_sent_invoices_status()
     else:
-      ksef_prepare(invoice_name='FV/2026/03/00002')
+      ksef_prepare(invoice_name='FV/2026/07/00002')
   except Exception as e:
     print(e)
   finally:
