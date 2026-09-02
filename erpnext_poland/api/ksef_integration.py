@@ -1,8 +1,6 @@
 import frappe
 from frappe.model.document import Document
 
-from erpnext_poland.ksef_utils import compute_vat_month
-
 def fetch_and_create_invoices():
     # 1. Pobierz dane z KSeF (logika autoryzacji i pobierania XML)
     raw_invoices = get_invoices_from_ksef_api() 
@@ -20,7 +18,6 @@ def create_purchase_invoice(ksef_data):
         "doctype": "Purchase Invoice",
         "supplier": map_nip_to_supplier(ksef_data['nip_sprzedawcy']),
         "posting_date": ksef_data['data_wystawienia'],
-        "custom_vat_month": compute_vat_month(ksef_data['data_wystawienia']), # RRRRMM
         "bill_no": ksef_data['numer_ksef'], # Numer KSeF warto trzymać w osobnym polu
         "currency": ksef_data['waluta'],
         "items": []

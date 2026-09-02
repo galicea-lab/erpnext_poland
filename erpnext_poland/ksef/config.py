@@ -4,13 +4,6 @@ import frappe
 
 
 # 1. Czysta struktura danych (zastępuje Pydantic)
-
-# Tryby wypełniania pozycji faktury zakupu importowanej z KSeF
-ITEMS_MODE_PENDING = "KSeF-PENDING"
-ITEMS_MODE_PREVIOUS = "Poprzednia faktura dostawcy"
-ITEMS_MODE_XML = "Pozycje z formularza KSeF"
-
-
 @dataclass
 class KSeF2Settings:
 	cert_pfx: str
@@ -21,7 +14,6 @@ class KSeF2Settings:
 	item_code : str
 	description : str
 	default_expense_account : str
-	items_mode : str = ITEMS_MODE_PENDING
 
 @dataclass
 class Settings:
@@ -47,8 +39,7 @@ def get_accounting_settings() -> Settings:
 		credit_to_usd=ksef_doc.credit_to_usd,
 	  item_code = ksef_doc.item_code,
 	  description = ksef_doc.description,
-		default_expense_account = ksef_doc.default_expense_account,
-		items_mode = getattr(ksef_doc, "ksef_items_mode", None) or ITEMS_MODE_PENDING
+		default_expense_account = ksef_doc.default_expense_account
 	)
 
 	return Settings(ksef2=ksef_settings)

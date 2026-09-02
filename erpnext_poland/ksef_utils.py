@@ -1,22 +1,8 @@
-import re
-import unicodedata
-
 import frappe
 from lxml import etree  as ET
 
-from erpnext_poland.ksef.config import (
-    get_accounting_settings,
-    ITEMS_MODE_PENDING,
-    ITEMS_MODE_PREVIOUS,
-    ITEMS_MODE_XML
-)
+from erpnext_poland.ksef.config import get_accounting_settings
 from frappe.utils.file_manager import save_file
-from frappe.utils import getdate, nowdate
-
-
-def compute_vat_month(date_value=None):
-  """Miesiąc rozliczenia VAT w formacie RRRRMM (np. 202601)."""
-  return getdate(date_value or nowdate()).strftime("%Y%m")
 
 
 def attach_ksef_xml_to_invoice(invoice_name, xml_content, ksef_number):
@@ -40,7 +26,6 @@ def import_ksef_header(xml_content, metadata):
         "supplier": metadata['supplier'],
         "bill_no": metadata['ksef_number'],
         "posting_date": metadata['date'],
-        "custom_vat_month": compute_vat_month(metadata.get('date')), # RRRRMM
         "custom_ksef_xml": xml_content, # Przechowujemy XML do późniejszego użycia
         "items": [{
             "item_code": "KSeF-PENDING", # Specjalny przedmiot techniczny
@@ -173,141 +158,6 @@ def parse_ksef_xml(xml_content):
 
   return ksef_data
 
-def _slugify_item_code(description):
-  """Buduje kod asortymentu (ASCII, A-Z0-9 i myślniki) z opisu pozycji KSeF."""
-  text = unicodedata.normalize("NFKD", description or "")
-  text = text.encode("ascii", "ignore").decode("ascii")
-  code = re.sub(r"[^A-Za-z0-9]+", "-", text).strip("-").upper()
-  return code[:140] or "KSEF-ITEM"
-
-
-def get_or_create_item_from_description(description):
-  """Zwraca item_code dla podanego opisu z formularza KSeF,
-  tworząc definicję Item jeśli jeszcze nie istnieje."""
-  desc = (description or "").strip() or "Brak opisu"
-  existing = frappe.get_all(
-      "Item",
-      filters={"item_name": desc},
-      fields=["name"],
-      order_by="creation asc",
-      limit_page_length=1
-  )
-  if existing:
-    return existing[0].name
-
-  item_code = _slugify_item_code(desc)
-  if frappe.db.exists("Item", item_code):
-    # Kod zajęty przez inny asortyment – dopisujemy licznik
-    i = 2
-    while frappe.db.exists("Item", f"{item_code}-{i}"):
-      i += 1
-    item_code = f"{item_code}-{i}"
-
-  item_group = frappe.db.get_single_value("Stock Settings", "default_item_group") \
-      or frappe.db.get_value("Item Group", {}, "name")
-  if not item_group:
-    frappe.throw("Nie można utworzyć asortymentu: brak grupy asortymentowej (Item Group). "
-                 "Utwórz grupę lub ustaw domyślną w Ustawieniach magazynowych.")
-
-  new_item = frappe.get_doc({
-    "doctype": "Item",
-    "item_code": item_code,
-    "item_name": desc,
-    "item_group": item_group,
-    "stock_uom": "Unit",
-    "is_stock_item": 0,
-    "is_fixed_asset": 0,
-    "is_purchase_item": 1,
-    "is_sales_item": 0
-  })
-  new_item.insert()
-  frappe.msgprint(f"Utworzono nowy asortyment: <b>{item_code}</b> ({desc})")
-  return new_item.name
-
-
-def get_items_from_previous_invoice(supplier, settings):
-  """Pozycje z ostatniej faktury zakupu tego dostawcy
-  (bez technicznej pozycji KSeF-PENDING)."""
-  prev = frappe.get_all(
-      "Purchase Invoice",
-      filters={
-        "supplier": supplier,
-        "docstatus": ["!=", 2]
-      },
-      fields=["name"],
-      order_by="posting_date desc, creation desc",
-      limit_page_length=1
-  )
-  if not prev:
-    return []
-  rows = frappe.get_all(
-      "Purchase Invoice Item",
-      filters={"parenttype": "Purchase Invoice", "parent": prev[0].name},
-      fields=["item_code", "qty", "uom", "rate", "description", "expense_account"],
-      order_by="idx asc"
-  )
-  pending_codes = {settings.ksef2.item_code, "KSeF-PENDING"}
-  items = []
-  for r in rows:
-    if r.item_code in pending_codes:
-      continue
-    row = {
-      "item_code": r.item_code,
-      "qty": r.qty,
-      "uom": r.uom,
-      "rate": r.rate,
-      "description": r.description
-    }
-    if r.expense_account:
-      row["expense_account"] = r.expense_account
-    items.append(row)
-  return items
-
-
-def build_invoice_items(mode, ksef_data, supplier, settings):
-  """Buduje listę pozycji faktury zakupu zgodnie z wybranym trybem:
-  - ITEMS_MODE_PENDING  : jedna techniczna pozycja KSeF-PENDING (dotychczasowe zachowanie)
-  - ITEMS_MODE_PREVIOUS : kopie pozycji z ostatniej faktury tego dostawcy
-  - ITEMS_MODE_XML      : pozycje odczytane z formularza KSeF (tworzy brakujące definicje)
-  W razie braku danych wraca do trybu KSeF-PENDING."""
-  if mode == ITEMS_MODE_PREVIOUS:
-    items = get_items_from_previous_invoice(supplier, settings)
-    if items:
-      return items
-    frappe.msgprint(
-        msg=f"Brak wcześniejszych pozycji dla dostawcy <b>{supplier}</b>. "
-            "Użyto pozycji technicznej.",
-        title="KSeF",
-        indicator="orange"
-    )
-  elif mode == ITEMS_MODE_XML:
-    xml_items = []
-    for row in ksef_data.get('items') or []:
-      desc = row.get('description') or "Brak opisu"
-      xml_items.append({
-        "item_code": get_or_create_item_from_description(desc),
-        "qty": row.get('qty') or 1,
-        "rate": row.get('net_rate') or 0,
-        "description": desc,
-        "uom": "Unit"
-      })
-    if xml_items:
-      return xml_items
-    frappe.msgprint(
-        msg="Formularz KSeF nie zawiera pozycji. Użyto pozycji technicznej.",
-        title="KSeF",
-        indicator="orange"
-    )
-
-  # Tryb domyślny: pozycja techniczna na łączną kwotę
-  return [{
-    "item_code": settings.ksef2.item_code,
-    "qty": 1,
-    "rate": ksef_data['total_amount'],
-    "description": settings.ksef2.description
-  }]
-
-
 def map_item(item):
   return 'Pieczęć elektroniczna'
 
@@ -333,22 +183,42 @@ def register_from_ksef():
           xml_string=f.read()
         ksef_data=parse_ksef_xml(xml_string)
         supplier=get_or_create_supplier_by_nip(ksef_data['supplier_nip'], ksef_data['supplier'])
-        new_invoice = frappe.get_doc({
+        if  ksef_data['currency']=='USD':  # !!! hardcoded - do poprawy
+          new_invoice = frappe.get_doc({
+            "doctype": "Purchase Invoice",
+            "supplier": supplier,
+            "posting_date": ksef_data['posting_date'],
+            "bill_no": ksef_data['bill_no'],
+            "currency": ksef_data['currency'],
+            "total_amount": ksef_data['total_amount'],
+            "ksef_numer": ksefID,
+            "credit_to": settings.ksef2.credit_to_usd, #'210.01.2 - Rozrachunki z dostawcami krajowymi - USD - TM', #!!!!
+            # "items": []
+            "items": [{
+              "item_code": settings.ksef2.item_code,  # Specjalny przedmiot techniczny
+              "qty": 1,
+              "rate": ksef_data['total_amount'],
+              "description": settings.ksef2.description,
+              "expense_account": settings.ksef2.default_expense_account
+            }]
+          })
+        else:
+          new_invoice = frappe.get_doc({
           "doctype": "Purchase Invoice",
           "supplier": supplier,
           "posting_date": ksef_data['posting_date'],
           "bill_no": ksef_data['bill_no'],
           "currency": ksef_data['currency'],
-          "total_amount": ksef_data['total_amount'],
+          "total_amount":ksef_data['total_amount'],
           "ksef_numer": ksefID,
-          "custom_vat_month": compute_vat_month(ksef_data['posting_date']), # RRRRMM
-          "items": build_invoice_items(settings.ksef2.items_mode, ksef_data, supplier, settings)
+          #"items": []
+          "items": [{
+            "item_code": settings.ksef2.item_code,  # Specjalny przedmiot techniczny
+            "qty": 1,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              "rate": ksef_data['total_amount'],
+            "description": settings.ksef2.description
+          }]
         })
-        if  ksef_data['currency']=='USD':  # !!! hardcoded - do poprawy
-          new_invoice.credit_to = settings.ksef2.credit_to_usd #'210.01.2 - Rozrachunki z dostawcami krajowymi - USD - TM', #!!!!
-          for row in new_invoice.items:
-            if not row.get("expense_account"):
-              row.expense_account = settings.ksef2.default_expense_account
         # Dodawanie pozycji faktury
         new_invoice.insert()
         # Teraz dołączamy plik, używając 'name' nowo utworzonej faktury
