@@ -19,6 +19,11 @@ def compute_vat_month(date_value=None):
   return getdate(date_value or nowdate()).strftime("%Y%m")
 
 
+def compute_month(date_value=None):
+  """Miesiąc faktury w formacie MM (np. 01)."""
+  return getdate(date_value or nowdate()).strftime("%m")
+
+
 def attach_ksef_xml_to_invoice(invoice_name, xml_content, ksef_number):
   file_name = f"KSeF_{ksef_number}.xml"
   # Używamy save_file zamiast frappe.get_doc("File", ...)
@@ -299,6 +304,20 @@ def build_invoice_items(mode, ksef_data, supplier, settings):
         indicator="orange"
     )
 
+  # Faktury proste (1-2 pozycje): zamiast pozycji technicznej używamy
+  # danych z pierwszej pozycji formularza KSeF (kartoteka Item zakładana automatycznie)
+  xml_items = ksef_data.get('items') or []
+  if len(xml_items) in (1, 2):
+    first = xml_items[0]
+    desc = first.get('description') or "Brak opisu"
+    return [{
+      "item_code": get_or_create_item_from_description(desc),
+      "qty": first.get('qty') or 1,
+      "rate": first.get('net_rate') or 0,
+      "description": desc,
+      "uom": "Unit"
+    }]
+
   # Tryb domyślny: pozycja techniczna na łączną kwotę
   return [{
     "item_code": settings.ksef2.item_code,
@@ -321,6 +340,15 @@ def register_from_ksef():
   for ksefID in ksef2_receive_invoices():
     try:
       print(ksefID)
+      if not ksefID:
+        # KSeF nie zwrócił jeszcze numeru dla tej faktury (opóźnienie po stronie KSeF) -
+        # pomijamy, kolejne uruchomienie crona (zakres 30 dni) spróbuje ponownie.
+        frappe.log_error(
+            "Otrzymano fakturę z KSeF bez przydzielonego numeru KSeF (ksefNumber) - "
+            "import pominięty, zostanie ponowiony przy kolejnym uruchomieniu.",
+            "KSeF - brak numeru faktury"
+        )
+        continue
       purchase_invoice = frappe.get_all("Purchase Invoice",
                                            filters={
                                              "ksef_numer":ksefID
@@ -342,6 +370,7 @@ def register_from_ksef():
           "total_amount": ksef_data['total_amount'],
           "ksef_numer": ksefID,
           "custom_vat_month": compute_vat_month(ksef_data['posting_date']), # RRRRMM
+          "custom_month": compute_month(ksef_data['posting_date']), # MM
           "items": build_invoice_items(settings.ksef2.items_mode, ksef_data, supplier, settings)
         })
         if  ksef_data['currency']=='USD':  # !!! hardcoded - do poprawy
