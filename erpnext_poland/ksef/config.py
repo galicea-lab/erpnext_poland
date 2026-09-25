@@ -21,6 +21,9 @@ class KSeF2Settings:
 	item_code : str
 	description : str
 	default_expense_account : str
+	vat_account_head : str
+	vat_cost_center : str
+	vat_description : str
 	items_mode : str = ITEMS_MODE_PENDING
 
 @dataclass
@@ -48,6 +51,9 @@ def get_accounting_settings() -> Settings:
 	  item_code = ksef_doc.item_code,
 	  description = ksef_doc.description,
 		default_expense_account = ksef_doc.default_expense_account,
+		vat_account_head = ksef_doc.vat_account_head,
+		vat_cost_center = ksef_doc.vat_cost_center,
+		vat_description = ksef_doc.vat_description,
 		items_mode = getattr(ksef_doc, "ksef_items_mode", None) or ITEMS_MODE_PENDING
 	)
 

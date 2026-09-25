@@ -1,3 +1,80 @@
+# Podatek VAT: wiersz dopisywany do faktury zakupu importowanej z KSeF
+# (patrz build_invoice_taxes() poniżej) - struktura tabeli:
+# `tabPurchase Taxes and Charges`;
+#+---------------------------------------+---------------+------+-----+--------------+-------+
+#| Field                                 | Type          | Null | Key | Default      | Extra |
+#+---------------------------------------+---------------+------+-----+--------------+-------+
+#| name                                  | varchar(140)  | NO   | PRI | NULL         |       |
+#| creation                              | datetime(6)   | YES  |     | NULL         |       |
+#| modified                              | datetime(6)   | YES  |     | NULL         |       |
+#| modified_by                           | varchar(140)  | YES  |     | NULL         |       |
+#| owner                                 | varchar(140)  | YES  |     | NULL         |       |
+#| docstatus                             | tinyint(4)    | NO   |     | 0            |       |
+#| idx                                   | int(11)       | NO   |     | 0            |       |
+#| category                              | varchar(140)  | YES  |     | Total        |       |
+#| add_deduct_tax                        | varchar(140)  | YES  |     | Add          |       |
+#| charge_type                           | varchar(140)  | YES  |     | On Net Total |       |
+#| row_id                                | varchar(140)  | YES  |     | NULL         |       |
+#| included_in_print_rate                | tinyint(4)    | NO   |     | 0            |       |
+#| included_in_paid_amount               | tinyint(4)    | NO   |     | 0            |       |
+#| account_head                          | varchar(140)  | YES  |     | NULL         |       |
+#| description                           | text          | YES  |     | NULL         |       |
+#| is_tax_withholding_account            | tinyint(4)    | NO   |     | 0            |       |
+#| set_by_item_tax_template              | tinyint(4)    | NO   |     | 0            |       |
+#| rate                                  | decimal(21,9) | NO   |     | 0.000000000  |       |
+#| cost_center                           | varchar(140)  | YES  |     | NULL         |       |
+#| project                               | varchar(140)  | YES  |     | NULL         |       |
+#| account_currency                      | varchar(140)  | YES  |     | NULL         |       |
+#| net_amount                            | decimal(21,9) | NO   |     | 0.000000000  |       |
+#| tax_amount                            | decimal(21,9) | NO   |     | 0.000000000  |       |
+#| tax_amount_after_discount_amount      | decimal(21,9) | NO   |     | 0.000000000  |       |
+#| total                                 | decimal(21,9) | NO   |     | 0.000000000  |       |
+#| base_net_amount                       | decimal(21,9) | NO   |     | 0.000000000  |       |
+#| base_tax_amount                       | decimal(21,9) | NO   |     | 0.000000000  |       |
+#| base_total                            | decimal(21,9) | NO   |     | 0.000000000  |       |
+#| base_tax_amount_after_discount_amount | decimal(21,9) | NO   |     | 0.000000000  |       |
+#| dont_recompute_tax                    | tinyint(4)    | NO   |     | 0            |       |
+#| parent                                | varchar(140)  | YES  | MUL | NULL         |       |
+#| parentfield                           | varchar(140)  | YES  |     | NULL         |       |
+#| parenttype                            | varchar(140)  | YES  |     | NULL         |       |
+#| allocate_full_amount_to_stock_items   | tinyint(4)    | NO   |     | 1            |       |
+#+---------------------------------------+---------------+------+-----+--------------+-------+
+# select * from `tabPurchase Taxes and Charges` where parent='FZ00064'\G
+#                                 name: tfrrfu3drs
+#                             creation: 2026-09-02 14:16:39.377575
+#                             modified: 2026-09-09 21:23:54.628201
+#                          modified_by: renia11@op.pl
+#                                owner: renia11@op.pl
+#                            docstatus: 1
+#                                  idx: 1
+#                             category: Total
+#                       add_deduct_tax: Add
+#                          charge_type: On Net Total
+#                               row_id: NULL
+#               included_in_print_rate: 0
+#              included_in_paid_amount: 0
+#                         account_head: 220.02 - VAT naliczony - TM
+#                          description: VAT naliczony
+#           is_tax_withholding_account: 0
+#             set_by_item_tax_template: 0
+#                                 rate: 23.000000000
+#                          cost_center: Główny - TM
+#                              project: NULL
+#                     account_currency: PLN
+#                           net_amount: 149.000000000
+#                           tax_amount: 34.270000000
+#     tax_amount_after_discount_amount: 34.270000000
+#                                total: 183.270000000
+#                      base_net_amount: 149.000000000
+#                      base_tax_amount: 34.270000000
+#                           base_total: 183.270000000
+#base_tax_amount_after_discount_amount: 34.270000000
+#                   dont_recompute_tax: 0
+#                               parent: FZ00064
+#                          parentfield: taxes
+#                           parenttype: Purchase Invoice
+
+
 import re
 import unicodedata
 
@@ -86,50 +163,6 @@ def send_to_ksef(invoice_name):
         frappe.throw("Błąd wysyłki")
 
 
-def parse_ksef_xml_bak(xml_content):
-  root = ET.fromstring(xml_content)
-
-  # Definicja przestrzeni nazw (dla schematu FA(3))
-  ns = {
-    'ns': 'http://crd.gov.pl/wzor/2025/06/25/13775/',  # Przestrzeń główna
-    'ter': 'http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/01/05/eD/DefinicjeTypy/'
-  }
-
-
-  # Funkcja pomocnicza do pobierania tekstu z uwzględnieniem namespace
-  def get_val(path):
-    node = root.find(path, ns)
-    return node.text if node is not None else None
-
-  # Mapowanie nagłówka faktury
-  ksef_data = {
-    "ksef_number": get_val(".//ns:NumerKSeF"),  # Jeśli jest w pliku
-    "bill_no": get_val(".//ns:Fa/ns:P_2"),  # Numer faktury sprzedawcy
-    "posting_date": get_val(".//ns:Fa/ns:P_1"),  # Data wystawienia
-    "currency": get_val(".//ns:Fa/ns:KodWaluty"),
-    "total_amount": float(get_val(".//ns:Fa/ns:P_15") or 0),
-    "supplier_nip": get_val(".//ns:Podmiot1/ns:DaneIdentyfikacyjne/ns:NIP"),
-    "supplier": get_val(".//ns:Podmiot1/ns:DaneIdentyfikacyjne/ns:Nazwa"),
-    "items": []
-  }
-
-  # Pobieranie pozycji (tylko jeśli chcesz je od razu, np. do sumowania)
-  for wiersz in root.findall(".//ns:Fa/ns:FaWiersz", ns):
-    try:
-      vat_rate=wiersz.find("ns:P_12", ns).text  # np. "23"
-    except:
-      vat_rate='23'
-    ksef_data["items"].append({
-      "description": wiersz.find("ns:P_7", ns).text if wiersz.find("ns:P_7",
-                                                                   ns) is not None else "Brak opisu",
-      "qty": float(wiersz.find("ns:P_8B", ns).text or 1) if wiersz.find("ns:P_8B",
-                                                                        ns) is not None else 1,
-      "net_rate": float(wiersz.find("ns:P_9A", ns).text or 0),
-      "vat_rate":vat_rate
-    })
-  return ksef_data
-
-
 import xml.etree.ElementTree as ET
 
 
@@ -156,8 +189,14 @@ def parse_ksef_xml(xml_content):
     "posting_date": get_val(root, ".//ns:Fa/ns:P_1"),
     "currency": get_val(root, ".//ns:Fa/ns:KodWaluty", "PLN"),  # Domyślnie PLN
     "total_amount": float(get_val(root, ".//ns:Fa/ns:P_15", 0)),
+    "total_net": float(get_val(root, ".//ns:Fa/ns:P_13_1") or 0),
+    "total_vat": float(get_val(root, ".//ns:Fa/ns:P_14_1") or 0),
     "supplier_nip": get_val(root, ".//ns:Podmiot1/ns:DaneIdentyfikacyjne/ns:NIP"),
     "supplier": get_val(root, ".//ns:Podmiot1/ns:DaneIdentyfikacyjne/ns:Nazwa"),
+    # pozostałe pola nagłówka faktury - do wykorzystania
+    "country_code": get_val(root, ".//ns:Podmiot1/ns:Adres/ns:KodKraju"),
+    "address_line1": get_val(root, ".//ns:Podmiot1/ns:Adres/ns:AdresL1"),
+
     "items": []
   }
 
@@ -318,17 +357,99 @@ def build_invoice_items(mode, ksef_data, supplier, settings):
       "uom": "Unit"
     }]
 
-  # Tryb domyślny: pozycja techniczna na łączną kwotę
+  # Tryb domyślny: pozycja techniczna na łączną kwotę netto
+  # (P_15 to kwota brutto - podatek VAT dopisywany jest osobno,
+  # patrz build_invoice_taxes() poniżej)
   return [{
     "item_code": settings.ksef2.item_code,
     "qty": 1,
-    "rate": ksef_data['total_amount'],
+    "rate": ksef_data.get('total_net') or ksef_data['total_amount'],
     "description": settings.ksef2.description
   }]
 
 
-def map_item(item):
-  return 'Pieczęć elektroniczna'
+def _ksef_vat_rate(raw_rate):
+  """Zamienia wartość P_12 z formularza KSeF (np. '23', '23%', 'zw') na
+  liczbę zmiennoprzecinkową ze stawką VAT (procent). Zwraca None, jeśli
+  stawki nie da się rozpoznać jako liczby (np. zwolnienie 'zw')."""
+  if raw_rate is None:
+    return None
+  text = str(raw_rate).strip().replace("%", "").replace(",", ".")
+  try:
+    return float(text)
+  except ValueError:
+    return None
+
+
+def build_invoice_taxes(ksef_data, settings):
+  """Buduje listę wierszy podatku VAT (Purchase Taxes and Charges) na
+  podstawie danych z formularza KSeF oraz konta/centrum kosztów/opisu
+  skonfigurowanych w Polish Accounting Settings.
+
+  - Jedna stawka VAT na fakturze (typowy przypadek): jeden wiersz
+    z charge_type "On Net Total" - ERPNext sam wyliczy kwotę podatku
+    od sumy netto faktury.
+  - Kilka różnych stawek VAT w pozycjach: jeden wiersz na stawkę,
+    z charge_type "Actual" i kwotą podatku wyliczoną wprost z pozycji
+    o danej stawce (żeby uniknąć podwójnego naliczenia od sumy netto)."""
+  account_head = settings.ksef2.vat_account_head
+  cost_center = settings.ksef2.vat_cost_center
+  base_description = settings.ksef2.vat_description or "VAT naliczony"
+
+  if not account_head:
+    frappe.msgprint(
+        msg="Nie skonfigurowano konta VAT naliczonego (Polish Accounting "
+            "Settings). Pomijam dopisanie podatku VAT do faktury.",
+        title="KSeF",
+        indicator="orange"
+    )
+    return []
+
+  # Grupujemy pozycje wg rozpoznanej stawki VAT (P_12)
+  groups = {}  # stawka -> suma netto
+  for row in ksef_data.get('items') or []:
+    rate = _ksef_vat_rate(row.get('vat_rate'))
+    if rate is None:
+      continue
+    net_amount = (row.get('qty') or 1) * (row.get('net_rate') or 0)
+    groups[rate] = groups.get(rate, 0) + net_amount
+
+  if not groups:
+    # Brak stawek w pozycjach - liczymy jedną stawkę z sum nagłówkowych
+    total_net = ksef_data.get('total_net') or 0
+    total_vat = ksef_data.get('total_vat') or 0
+    if not total_net:
+      return []
+    rate = round(total_vat / total_net * 100, 2)
+    groups = {rate: total_net}
+
+  if len(groups) == 1:
+    (rate,) = groups.keys()
+    return [{
+      "category": "Total",
+      "add_deduct_tax": "Add",
+      "charge_type": "On Net Total",
+      "account_head": account_head,
+      "description": base_description,
+      "rate": rate,
+      "cost_center": cost_center
+    }]
+
+  # Kilka stawek VAT - jeden wiersz na stawkę, kwota podatku wyliczona
+  # wprost z sumy netto pozycji objętych daną stawką
+  taxes = []
+  for rate, net_amount in sorted(groups.items()):
+    taxes.append({
+      "category": "Total",
+      "add_deduct_tax": "Add",
+      "charge_type": "Actual",
+      "account_head": account_head,
+      "description": f"{base_description} {rate:g}%",
+      "rate": rate,
+      "tax_amount": round(net_amount * rate / 100, 2),
+      "cost_center": cost_center
+    })
+  return taxes
 
 @frappe.whitelist()
 def register_from_ksef():
@@ -371,7 +492,8 @@ def register_from_ksef():
           "ksef_numer": ksefID,
           "custom_vat_month": compute_vat_month(ksef_data['posting_date']), # RRRRMM
           "custom_month": compute_month(ksef_data['posting_date']), # MM
-          "items": build_invoice_items(settings.ksef2.items_mode, ksef_data, supplier, settings)
+          "items": build_invoice_items(settings.ksef2.items_mode, ksef_data, supplier, settings),
+          "taxes": build_invoice_taxes(ksef_data, settings)
         })
         if  ksef_data['currency']=='USD':  # !!! hardcoded - do poprawy
           new_invoice.credit_to = settings.ksef2.credit_to_usd #'210.01.2 - Rozrachunki z dostawcami krajowymi - USD - TM', #!!!!

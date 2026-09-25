@@ -12,9 +12,14 @@
    "nip",
    "test_api_url",
    "credit_to_usd",
+   "default_expense_account",
    "item_code",
    "description",
-   "ksef_items_mode"
+   "ksef_items_mode",
+   "section_break_vat",
+   "vat_account_head",
+   "vat_cost_center",
+   "vat_description"
   ],
  "fields": [
   {
@@ -54,6 +59,13 @@
    "label": "credit_to_usd"
   },
   {
+   "description": "Domyślne konto kosztów/wydatków dla pozycji faktur w walucie USD, gdy pozycja nie ma ustawionego własnego konta",
+   "fieldname": "default_expense_account",
+   "fieldtype": "Link",
+   "label": "default_expense_account",
+   "options": "Account"
+  },
+  {
    "description": "Kod asortymentu",
    "fieldname": "item_code",
    "fieldtype": "Data",
@@ -72,13 +84,39 @@
    "fieldtype": "Select",
    "label": "\u0179r\u00f3d\u0142o pozycji faktury zakupu",
    "options": "KSeF-PENDING\nPoprzednia faktura dostawcy\nPozycje z formularza KSeF"
+  },
+  {
+   "fieldname": "section_break_vat",
+   "fieldtype": "Section Break",
+   "label": "VAT"
+  },
+  {
+   "description": "Konto VAT naliczonego, na które trafi wiersz podatku VAT wstawiany do faktury zakupu importowanej z KSeF",
+   "fieldname": "vat_account_head",
+   "fieldtype": "Link",
+   "label": "Konto VAT naliczonego",
+   "options": "Account"
+  },
+  {
+   "description": "Centrum kosztów przypisywane do wiersza podatku VAT",
+   "fieldname": "vat_cost_center",
+   "fieldtype": "Link",
+   "label": "Centrum kosztów VAT",
+   "options": "Cost Center"
+  },
+  {
+   "default": "VAT naliczony",
+   "description": "Opis wiersza podatku VAT w tabeli Purchase Taxes and Charges",
+   "fieldname": "vat_description",
+   "fieldtype": "Data",
+   "label": "Opis VAT"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2026-04-15 12:55:19.488704",
+ "modified": "2026-09-25 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Polish Accounting",
  "name": "Polish Accounting Settings",
