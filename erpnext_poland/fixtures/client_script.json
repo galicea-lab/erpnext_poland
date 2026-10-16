@@ -2,6 +2,50 @@
  {
   "docstatus": 0,
   "doctype": "Client Script",
+  "dt": "Journal Entry",
+  "enabled": 1,
+  "modified": "2026-02-18 10:25:12.579538",
+  "module": "Polish Accounting",
+  "name": "jentry_month",
+  "script": "frappe.ui.form.on('Journal Entry', {\n    refresh: function(frm) {\n        try {\n            updateCustomMonth(frm);\n        } catch (e) {\n            console.log('Błąd w refresh, ale kontynuuję:', e);\n        }\n    },\n    \n    posting_date: function(frm) {\n        try {\n            updateCustomMonth(frm);\n        } catch (e) {\n            console.log('Błąd w posting_date, ale kontynuuję:', e);\n        }\n    }\n});\n\nfunction updateCustomMonth(frm) {\n    if (frm && frm.doc && frm.doc.posting_date) {\n        try {\n            let posting_date = new Date(frm.doc.posting_date);\n            \n            // Sprawdź czy data jest poprawna\n            if (isNaN(posting_date.getTime())) {\n                console.log('Nieprawidłowa data:', frm.doc.posting_date);\n                return;\n            }\n            \n            let month = posting_date.getMonth() + 1;\n            let monthFormatted = month.toString().padStart(2, '0');\n            \n            frm.set_value('custom_month', monthFormatted);\n            console.log('OK - ustawiono:', monthFormatted);\n        } catch (e) {\n            console.log('Błąd w updateCustomMonth:', e);\n        }\n    } else {\n        // Brak daty - wyczyść pole\n        if (frm && frm.set_value) {\n            frm.set_value('custom_month', '');\n        }\n    }\n}",
+  "view": "Form"
+ },
+ {
+  "docstatus": 1,
+  "doctype": "Client Script",
+  "dt": "Sales Invoice",
+  "enabled": 1,
+  "modified": "2026-10-16 10:30:46.067002",
+  "module": "Polish Accounting",
+  "name": "sales_month",
+  "script": "frappe.ui.form.on('Sales Invoice', {\n    refresh: function(frm) {\n        try {\n            updateCustomMonth(frm);\n        } catch (e) {\n            console.log('Błąd w refresh, ale kontynuuję:', e);\n        }\n    },\n    \n    posting_date: function(frm) {\n        try {\n            updateCustomMonth(frm);\n        } catch (e) {\n            console.log('Błąd w posting_date, ale kontynuuję:', e);\n        }\n    }\n});\n\nfunction updateCustomMonth(frm) {\n    if (frm && frm.doc && frm.doc.posting_date) {\n        try {\n            let posting_date = new Date(frm.doc.posting_date);\n            \n            // Sprawdź czy data jest poprawna\n            if (isNaN(posting_date.getTime())) {\n                console.log('Nieprawidłowa data:', frm.doc.posting_date);\n                return;\n            }\n            \n            let month = posting_date.getMonth() + 1;\n            let monthFormatted = month.toString().padStart(2, '0');\n            let year = posting_date.getFullYear().toString();\n            let vatMonth = frm.doc.custom_vat_month;\n            \n            if (!vatMonth) frm.set_value('custom_vat_month', year+monthFormatted);\n            frm.set_value('custom_month', monthFormatted);\n            console.log('OK - ustawiono:', monthFormatted);\n        } catch (e) {\n            console.log('Błąd w updateCustomMonth:', e);\n        }\n    } else {\n        // Brak daty - wyczyść pole\n        if (frm && frm.set_value) {\n            frm.set_value('custom_month', '');\n        }\n    }\n}",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Purchase Invoice",
+  "enabled": 1,
+  "modified": "2026-03-10 07:12:12.488868",
+  "module": "Polish Accounting",
+  "name": "purchase_month",
+  "script": "frappe.ui.form.on('Purchase Invoice', {\n    refresh: function(frm) {\n        try {\n            updateCustomMonth(frm);\n        } catch (e) {\n            console.log('Błąd w refresh, ale kontynuuję:', e);\n        }\n    },\n    \n    posting_date: function(frm) {\n        try {\n            updateCustomMonth(frm);\n        } catch (e) {\n            console.log('Błąd w posting_date, ale kontynuuję:', e);\n        }\n    }\n});\n\nfunction updateCustomMonth(frm) {\n    if (frm && frm.doc && frm.doc.posting_date) {\n        try {\n            let posting_date = new Date(frm.doc.posting_date);\n            \n            // Sprawdź czy data jest poprawna\n            if (isNaN(posting_date.getTime())) {\n                console.log('Nieprawidłowa data:', frm.doc.posting_date);\n                return;\n            }\n            \n            let month = posting_date.getMonth() + 1;\n            let year = posting_date.getYear().toString();\n            let monthFormatted = month.toString().padStart(2, '0');\n            let vatMonth = frm.doc.custom_vat_month;\n            \n            frm.set_value('custom_month', monthFormatted);\n            if (!vatMonth) frm.set_value('custom_vat_month', year+monthFormatted);\n            console.log('OK - ustawiono:', monthFormatted);\n        } catch (e) {\n            console.log('Błąd w updateCustomMonth:', e);\n        }\n    } else {\n        // Brak daty - wyczyść pole\n        if (frm && frm.set_value) {\n            frm.set_value('custom_month', '');\n        }\n    }\n}",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Payment Entry",
+  "enabled": 1,
+  "modified": "2026-02-18 10:25:57.394653",
+  "module": "Polish Accounting",
+  "name": "payment_month",
+  "script": "frappe.ui.form.on('Payment Entry', {\n    refresh: function(frm) {\n        try {\n            updateCustomMonth(frm);\n        } catch (e) {\n            console.log('Błąd w refresh, ale kontynuuję:', e);\n        }\n    },\n    \n    posting_date: function(frm) {\n        try {\n            updateCustomMonth(frm);\n        } catch (e) {\n            console.log('Błąd w posting_date, ale kontynuuję:', e);\n        }\n    }\n});\n\nfunction updateCustomMonth(frm) {\n    if (frm && frm.doc && frm.doc.posting_date) {\n        try {\n            let posting_date = new Date(frm.doc.posting_date);\n            \n            // Sprawdź czy data jest poprawna\n            if (isNaN(posting_date.getTime())) {\n                console.log('Nieprawidłowa data:', frm.doc.posting_date);\n                return;\n            }\n            \n            let month = posting_date.getMonth() + 1;\n            let monthFormatted = month.toString().padStart(2, '0');\n            \n            frm.set_value('custom_month', monthFormatted);\n            console.log('OK - ustawiono:', monthFormatted);\n        } catch (e) {\n            console.log('Błąd w updateCustomMonth:', e);\n        }\n    } else {\n        // Brak daty - wyczyść pole\n        if (frm && frm.set_value) {\n            frm.set_value('custom_month', '');\n        }\n    }\n}",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
   "dt": "JPK_V7M",
   "enabled": 1,
   "modified": "2026-02-09 22:35:50.924577",

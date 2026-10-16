@@ -232,7 +232,7 @@ fixtures0 = [
 },
     {
         "doctype": "Client Script",
-        "filters": [["module", "in", ("KSeF","JPK")]]
+        "filters": [["module", "in", ("KSeF","JPK","Polish Accounting")]]
     },
 ]
 """
@@ -266,7 +266,7 @@ fixtures = [
     # Client Scripts
     {
         "doctype": "Client Script",
-        "filters": [["module", "in", ("KSeF", "JPK")]],
+        "filters": [["module", "in", ("KSeF", "JPK","Polish Accounting")]],
         "sync_on_migrate": 1
     }
 ]
