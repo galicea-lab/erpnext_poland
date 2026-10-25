@@ -76,6 +76,7 @@
 
 
 import re
+import time
 import unicodedata
 
 import frappe
@@ -527,6 +528,8 @@ def register_from_ksef():
     except Exception as e:
         frappe.log_error(frappe.get_traceback(), "Błąd pobierania KSeF")
         frappe.throw(f"Nie udało się wygenerować / zapisać pliku faktury: {str(e)}")
+    finally:
+      time.sleep(1)  # bezpieczny odstęp między wywołaniami
   return {
           "status": "OK",
     }
