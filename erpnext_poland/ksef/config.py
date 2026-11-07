@@ -7,8 +7,8 @@ import frappe
 
 # Tryby wypełniania pozycji faktury zakupu importowanej z KSeF
 ITEMS_MODE_PENDING = "KSeF-PENDING"
-ITEMS_MODE_PREVIOUS = "Poprzednia faktura dostawcy"
-ITEMS_MODE_XML = "Pozycje z formularza KSeF"
+ITEMS_MODE_PREVIOUS = "Previous supplier invoice"
+ITEMS_MODE_XML = "KSeF form items"
 
 
 @dataclass
