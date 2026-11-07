@@ -113,7 +113,7 @@ def ksef2_redeem_tokens(ksef_client, reference_number: str) -> AuthenticationTok
   if status.status.code == 200:  # Sukces
     return ksef_client.token_redeem()
   else:
-    raise Exception(f"Uwierzytelnienie nie powiodło się: {status.status.code} - {status.status.description}")
+    raise Exception(f"Authentication failed: {status.status.code} - {status.status.description}")
 
 
 def ksef2_refresh_token(ksef_client) -> AuthenticationTokenRefreshResponse:
@@ -149,5 +149,5 @@ def create_auth_request_xml2(challenge: str, identifier_type: str, identifier_va
     <SubjectIdentifierType>certificateSubject</SubjectIdentifierType>
 </AuthTokenRequest>"""
   else:
-    raise Exception('Niobsługiwany identyfikator')
+    raise Exception('Unsupported identifier type')
   return auth_xml.encode('utf-8')

@@ -96,10 +96,10 @@ RAR
 
 custom_fields = {
     "Account": [
-        {"label": "JPK Znacznik Konta", "fieldname": "jpk_znacznik_konta", "fieldtype": "Select", "options": "\n1\n2\n3\n4\n5\n6\n7\n8\nK_0_1\nK_0_2\nK_1_1\nK_2_1\nW_4\nW_5\nW_7", "insert_after": "account_type"},
-        {"label": "JPK Tag Podatkowy", "fieldname": "jpk_podatek_tag", "fieldtype": "Select", "options": "\nK_P_D\nK_N_P\nP_P_D\nP_N_P\nR_T_D\nR_P_U", "insert_after": "jpk_znacznik_konta"},
-        {"label": "JPK Pozycja Bilansu", "fieldname": "jpk_bilans_pozycja", "fieldtype": "Data", "insert_after": "jpk_podatek_tag"},
-        {"label": "JPK Pozycja RZiS", "fieldname": "jpk_rzis_pozycja", "fieldtype": "Data", "insert_after": "jpk_bilans_pozycja"}
+        {"label": "JPK Account Tag", "fieldname": "jpk_znacznik_konta", "fieldtype": "Select", "options": "\n1\n2\n3\n4\n5\n6\n7\n8\nK_0_1\nK_0_2\nK_1_1\nK_2_1\nW_4\nW_5\nW_7", "insert_after": "account_type"},
+        {"label": "JPK Tax Tag", "fieldname": "jpk_podatek_tag", "fieldtype": "Select", "options": "\nK_P_D\nK_N_P\nP_P_D\nP_N_P\nR_T_D\nR_P_U", "insert_after": "jpk_znacznik_konta"},
+        {"label": "JPK Balance Sheet Item", "fieldname": "jpk_bilans_pozycja", "fieldtype": "Data", "insert_after": "jpk_podatek_tag"},
+        {"label": "JPK P&L Item", "fieldname": "jpk_rzis_pozycja", "fieldtype": "Data", "insert_after": "jpk_bilans_pozycja"}
     ],
     "Sales Invoice": [
   {
@@ -108,7 +108,7 @@ custom_fields = {
    "insert_after": "connections_tab", # jest też w purchase
  
 #   "insert_after": "loyalty_redemption_cost_center",
-   "label": "JPK i KSeF"
+   "label": "JPK and KSeF"
   },
   {
    "fieldname": "section_jpk",
@@ -123,18 +123,18 @@ custom_fields = {
    "label": "KSeF"
   },
         # Sekcja KSeF
-        {"label": "KSeF Status", "fieldname": "ksef_status", "fieldtype": "Select", "options": "\nBrak\nOczekuje\nWysłano\nZaakceptowano\nOdrzucono", "insert_after": "section_ksef"},
-        {"label": "KSeF ID sesji", "fieldname": "ksef_reference_nr", "fieldtype": "Data", "read_only": 0, "insert_after": "ksef_status"},
-        {"label": "KSeF numer", "fieldname": "ksef_numer", "fieldtype": "Data", "read_only": 0, "insert_after": "ksef_reference_nr"},
-        {"label": "Data sprzedaży KSeF", "fieldname": "ksef_data_sprzedazy", "fieldtype": "Date", "insert_after": "ksef_numer"},
-        {"label": "Data wystawienia KSeF", "fieldname": "ksef_data_wystawienia", "fieldtype": "Date", "insert_after": "ksef_data_sprzedazy"},
-        {"label": "Mechanizm Podzielonej Płatności", "fieldname": "ksef_mpp", "fieldtype": "Check", "insert_after": "ksef_data_wystawienia"},
+        {"label": "KSeF Status", "fieldname": "ksef_status", "fieldtype": "Select", "options": "\nPending\nSent\nAccepted\nRejected\nError", "insert_after": "section_ksef"},
+        {"label": "KSeF Session ID", "fieldname": "ksef_reference_nr", "fieldtype": "Data", "read_only": 0, "insert_after": "ksef_status"},
+        {"label": "KSeF Number", "fieldname": "ksef_numer", "fieldtype": "Data", "read_only": 0, "insert_after": "ksef_reference_nr"},
+        {"label": "KSeF Sale Date", "fieldname": "ksef_data_sprzedazy", "fieldtype": "Date", "insert_after": "ksef_numer"},
+        {"label": "KSeF Issue Date", "fieldname": "ksef_data_wystawienia", "fieldtype": "Date", "insert_after": "ksef_data_sprzedazy"},
+        {"label": "Split Payment Mechanism", "fieldname": "ksef_mpp", "fieldtype": "Check", "insert_after": "ksef_data_wystawienia"},
         
         # Sekcja JPK na fakturze
-        {"label": "Procedura JPK", "fieldname": "jpk_procedura_vat", "fieldtype": "Select", "insert_after": "section_jpk",
+        {"label": "JPK Procedure", "fieldname": "jpk_procedura_vat", "fieldtype": "Select", "insert_after": "section_jpk",
           "options": "\nEE\nSW\nTP\nTT_WNT\nTT_D\nMR_T\nMR_UZ\nI_42\nI_63\nB_SPV\nB_SPV_DOSTAWA\nB_MPV_PROWIZJA" },
         {
-        "label": "JPK_VAT Typ Transakcji",
+        "label": "JPK_VAT Transaction Type",
         "fieldname": "jpk_vat_typ_transakcji",
         "fieldtype": "Select",
         "options": "SP\nWEW\nZAK\nIMP\nEKS\nSW\nINNE",
@@ -147,25 +147,25 @@ custom_fields = {
         "fieldtype": "Select",
         "options": "\nGTU_01\nGTU_02\nGTU_03\nGTU_04\nGTU_05\nGTU_06\nGTU_07\nGTU_08\nGTU_09\nGTU_10\nGTU_11\nGTU_12\nGTU_13",
         "insert_after": "jpk_vat_typ_transakcji",
-        "description": "Grupa Towarów i Usług"
+        "description": "Group of Goods and Services"
     },
     {
         "label": "JPK_VAT IED",
         "fieldname": "jpk_vat_ied",
         "fieldtype": "Check",
         "insert_after": "jpk_vat_gtu",
-        "description": "Intrastat - Dostawa towarów"
+        "description": "Intrastat - Supply of goods"
     },
     {
-        "label": "JPK_VAT IED Kod Kraju",
+        "label": "JPK_VAT IED Country Code",
         "fieldname": "jpk_vat_ied_kraj",
         "fieldtype": "Data",
         "insert_after": "jpk_vat_ied",
-        "description": "Kod kraju dla IED (2 znaki)"
+        "description": "Country code for IED (2 characters)"
     }
     ],
     "Sales Invoice Item": [
-        {"label": "Kod GTU", "fieldname": "jpk_gtu", "fieldtype": "Select", "options": "\nGTU_01\nGTU_02\nGTU_03\nGTU_04\nGTU_05\nGTU_06\nGTU_07\nGTU_08\nGTU_09\nGTU_10\nGTU_11\nGTU_12\nGTU_13", "insert_after": "description"}
+        {"label": "GTU Code", "fieldname": "jpk_gtu", "fieldtype": "Select", "options": "\nGTU_01\nGTU_02\nGTU_03\nGTU_04\nGTU_05\nGTU_06\nGTU_07\nGTU_08\nGTU_09\nGTU_10\nGTU_11\nGTU_12\nGTU_13", "insert_after": "description"}
     ]
 }
 
@@ -178,50 +178,50 @@ custom_fields["Purchase Invoice"] = custom_fields["Sales Invoice"].copy()
 
 custom_fields["Item"] = [
     {
-        "label": "JPK_VAT GTU Domyślny",
+        "label": "JPK_VAT Default GTU",
         "fieldname": "jpk_vat_gtu_domyslny",
         "fieldtype": "Select",
         "options": "\nGTU_01\nGTU_02\nGTU_03\nGTU_04\nGTU_05\nGTU_06\nGTU_07\nGTU_08\nGTU_09\nGTU_10\nGTU_11\nGTU_12\nGTU_13",
         "insert_after": "taxes",
-        "description": "Domyślna grupa GTU dla towaru/usługi"
+        "description": "Default GTU group for the item/service"
     },
     {
-        "label": "JPK_VAT Eksport",
+        "label": "JPK_VAT Export",
         "fieldname": "jpk_vat_eksport",
         "fieldtype": "Check",
         "insert_after": "jpk_vat_gtu_domyslny",
-        "description": "Towar przeznaczony na eksport"
+        "description": "Goods intended for export"
     },
     {
         "label": "JPK_VAT SW",
         "fieldname": "jpk_vat_sw",
         "fieldtype": "Check",
         "insert_after": "jpk_vat_eksport",
-        "description": "Środek Wysokoenergetyczny"
+        "description": "High-energy product"
     }
 ]
 custom_fields["Company"] = [
     {
-        "label": "JPK Kod Urzędu",
+        "label": "JPK Tax Office Code",
         "fieldname": "jpk_kod_urzedu",
         "fieldtype": "Data",
         "insert_after": "tax_id",
-        "description": "Kod urzędu skarbowego (np. 1415)"
+        "description": "Tax office code (e.g. 1415)"
     },
     {
         "label": "JPK REGON",
         "fieldname": "jpk_regon",
         "fieldtype": "Data",
         "insert_after": "jpk_kod_urzedu",
-        "description": "Numer REGON (jeśli dotyczy)"
+        "description": "REGON number (if applicable)"
     },
     {
-        "label": "JPK Forma Opodatkowania",
+        "label": "JPK Taxation Form",
         "fieldname": "jpk_forma_opodatkowania",
         "fieldtype": "Select",
         "options": "G\nL\nR\nI",  # Generalna, Łączna, Ryczałt, Karta podatkowa
         "insert_after": "jpk_regon",
-        "description": "Forma opodatkowania"
+        "description": "Taxation form"
     }
 ]
 

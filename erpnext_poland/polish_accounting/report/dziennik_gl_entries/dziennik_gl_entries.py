@@ -24,7 +24,7 @@ def get_chart_data(data, filters):
     dziennik_summary = {}
     
     for row in data:
-        dziennik = row.get("dziennik") or _("Brak dziennika")
+        dziennik = row.get("dziennik") or _("No Journal")
         if dziennik not in dziennik_summary:
             dziennik_summary[dziennik] = {"debit": 0, "credit": 0}
         
@@ -117,7 +117,7 @@ def get_columns():
         },
         {
             "fieldname": "dziennik",
-            "label": _("Dziennik"),
+            "label": _("Journal"),
             "fieldtype": "Link",
             "options": "dziennik_definicja",
             "width": 120

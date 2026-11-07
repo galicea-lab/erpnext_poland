@@ -50,7 +50,7 @@ def setup_test_environment():
 def jpkv7n_prepare():
   try:
     company_name = frappe.defaults.get_user_default("Company")
-    print(f"Pobrano firmę: {company_name}")
+    print(f"Company fetched: {company_name}")
     xml_str = frappe.call('erpnext_poland.jpk.generator.generate_vat7m.export_jpk_to_xml',
                          company=company_name,
                          year=2026,

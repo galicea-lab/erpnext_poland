@@ -5,7 +5,7 @@ import requests
 @frappe.whitelist()
 def synchronizuj_kursy():
     """Pobiera kursy z NBP i zapisuje w ERPNext."""
-    frappe.log_error("To jest testowa wiadomość z zadania cron", "Synchronizacja NBP")
+    frappe.log_error("This is a test message from the cron job", "NBP synchronisation")
     url = "http://api.nbp.pl/api/exchangerates/tables/A/?format=json"
     
     try:
@@ -26,7 +26,7 @@ def synchronizuj_kursy():
                 # ...
             
             frappe.db.commit()
-            frappe.logger().info(f"Synchronizacja kursów NBP zakończona: {len(rates)} walut")
+            frappe.logger().info(f"NBP exchange rate synchronisation finished: {len(rates)} currencies")
             
     except Exception as e:
-        frappe.log_error(title="Błąd synchronizacji kursów NBP", message=str(e))
+        frappe.log_error(title="NBP exchange rate synchronisation error", message=str(e))

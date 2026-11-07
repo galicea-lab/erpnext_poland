@@ -1,4 +1,5 @@
 import frappe
+from frappe import _
 from .jpk.generator.generate_vat7m import jpk_v7m_xml
 
 def d2(d):
@@ -58,15 +59,17 @@ def create_jpk_v7m(jpk_ident):
         # 4. Opcjonalnie – ładny komunikat w Activity / Comments
         doc.add_comment(
             "Attachment",
-            f"Wygenerowano i dołączono plik JPK_V7M: <a href='{file_doc.file_url}'>{file_doc.file_name}</a>"
+            f"Generated and attached the JPK_V7M file: <a href='{file_doc.file_url}'>{file_doc.file_name}</a>"
         )
 
         # 5. Można odświeżyć pole _attachments (czasami pomaga w UI)
         doc.set("__attachments", True)
 
         frappe.msgprint(
-            msg = f"Plik JPK_V7M został wygenerowany i dołączony jako załącznik.<br><b>{file_doc.file_name}</b>",
-            title = "Sukces",
+            msg = _("The JPK_V7M file has been generated and attached.<br><b>{0}</b>").format(
+                file_doc.file_name
+            ),
+            title = "Success",
             indicator = "green"
         )
 
@@ -77,5 +80,5 @@ def create_jpk_v7m(jpk_ident):
         }
 
     except Exception as e:
-        frappe.log_error(frappe.get_traceback(), "Błąd generowania JPK_V7M")
-        frappe.throw(f"Nie udało się wygenerować / zapisać pliku JPK: {str(e)}")
+        frappe.log_error(frappe.get_traceback(), "JPK_V7M generation error")
+        frappe.throw(_("Failed to generate / save the JPK file: {0}").format(str(e)))

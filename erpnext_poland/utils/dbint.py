@@ -23,7 +23,7 @@ def get_or_create_supplier_by_nip(nip, supplier_name=None, defaults=None):
         str: supplier_name (istniejącego lub nowo utworzonego dostawcy)
     """
     if not nip:
-        frappe.throw(_("NIP jest wymagany"))
+        frappe.throw(_("NIP is required"))
 
     nip = nip.strip().replace("-", "").replace(" ", "")
 
@@ -60,7 +60,7 @@ def get_or_create_supplier_by_nip(nip, supplier_name=None, defaults=None):
 
     try:
         new_supplier.insert(ignore_permissions=False)  # zmień na True jeśli chcesz ominąć permisje
-        frappe.msgprint(_("Utworzono nowego dostawcę: {0} ({1})").format(
+        frappe.msgprint(_("Created supplier: {0} ({1})").format(
             new_supplier.supplier_name, new_supplier.name
         ))
         return new_supplier.supplier_name
@@ -75,10 +75,10 @@ def get_or_create_supplier_by_nip(nip, supplier_name=None, defaults=None):
         if supplier_name:
             return supplier_name
         else:
-            frappe.throw(_("Błąd podczas tworzenia dostawcy – duplikat, ale nie można odczytać"))
+            frappe.throw(_("Error creating the supplier - duplicate, but it cannot be read back"))
 
     except Exception as e:
-        frappe.throw(_("Błąd podczas tworzenia dostawcy: {0}").format(str(e)))
+        frappe.throw(_("Error creating the supplier: {0}").format(str(e)))
 
 
 def test():

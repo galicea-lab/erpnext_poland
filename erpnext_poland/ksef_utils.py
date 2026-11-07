@@ -80,6 +80,7 @@ import time
 import unicodedata
 
 import frappe
+from frappe import _
 from lxml import etree  as ET
 
 from erpnext_poland.ksef.config import (
@@ -129,7 +130,7 @@ def import_ksef_header(xml_content, metadata):
             "item_code": "KSeF-PENDING", # Specjalny przedmiot techniczny
             "qty": 1,
             "rate": metadata['total_amount'],
-            "description": "Faktura oczekująca na kategoryzację"
+            "description": "Invoice pending categorization"
         }]
     })
     doc.insert()
@@ -157,11 +158,11 @@ def send_to_ksef(invoice_name):
         invoice.db_set("ksef_session_id", sessionId)  # zapisz numer KSeF
     if referenceNumber:
         invoice.db_set("ksef_reference_nr", referenceNumber)  # zapisz numer KSeF
-        invoice.db_set("ksef_status", "Wysłano")  # custom field
-        frappe.msgprint("Faktura wysłana do KSeF: " + referenceNumber)
+        invoice.db_set("ksef_status", "Sent")  # custom field
+        frappe.msgprint(_("Invoice sent to KSeF: {0}").format(referenceNumber))
         frappe.db.commit()
     else:
-        frappe.throw("Błąd wysyłki")
+        frappe.throw(_("Sending the invoice to KSeF failed"))
 
 
 import xml.etree.ElementTree as ET
@@ -251,8 +252,8 @@ def get_or_create_item_from_description(description):
   item_group = frappe.db.get_single_value("Stock Settings", "item_group") \
       or frappe.db.get_value("Item Group", {}, "name")
   if not item_group:
-    frappe.throw("Nie można utworzyć asortymentu: brak grupy asortymentowej (Item Group). "
-                 "Utwórz grupę lub ustaw domyślną w Ustawieniach magazynowych.")
+    frappe.throw(_("Cannot create the item: no Item Group is set. "
+                 "Create one or set a default in Stock Settings."))
 
   new_item = frappe.get_doc({
     "doctype": "Item",
@@ -266,7 +267,7 @@ def get_or_create_item_from_description(description):
     "is_sales_item": 0
   })
   new_item.insert()
-  frappe.msgprint(f"Utworzono nowy asortyment: <b>{item_code}</b> ({desc})")
+  frappe.msgprint(_("Created item: <b>{0}</b> ({1})").format(item_code, desc))
   return new_item.name
 
 
@@ -320,15 +321,15 @@ def build_invoice_items(mode, ksef_data, supplier, settings):
     if items:
       return items
     frappe.msgprint(
-        msg=f"Brak wcześniejszych pozycji dla dostawcy <b>{supplier}</b>. "
-            "Użyto pozycji technicznej.",
+        msg=_("No previous items found for supplier <b>{0}</b>. "
+            "A technical item was used.").format(supplier),
         title="KSeF",
         indicator="orange"
     )
   elif mode == ITEMS_MODE_XML:
     xml_items = []
     for row in ksef_data.get('items') or []:
-      desc = row.get('description') or "Brak opisu"
+      desc = row.get('description') or "No description"
       xml_items.append({
         "item_code": get_or_create_item_from_description(desc),
         "qty": row.get('qty') or 1,
@@ -339,7 +340,7 @@ def build_invoice_items(mode, ksef_data, supplier, settings):
     if xml_items:
       return xml_items
     frappe.msgprint(
-        msg="Formularz KSeF nie zawiera pozycji. Użyto pozycji technicznej.",
+        msg=_("The KSeF form contains no items. A technical item was used."),
         title="KSeF",
         indicator="orange"
     )
@@ -395,12 +396,12 @@ def build_invoice_taxes(ksef_data, settings):
     o danej stawce (żeby uniknąć podwójnego naliczenia od sumy netto)."""
   account_head = settings.ksef2.vat_account_head
   cost_center = settings.ksef2.vat_cost_center
-  base_description = settings.ksef2.vat_description or "VAT naliczony"
+  base_description = settings.ksef2.vat_description or "Input VAT"
 
   if not account_head:
     frappe.msgprint(
-        msg="Nie skonfigurowano konta VAT naliczonego (Polish Accounting "
-            "Settings). Pomijam dopisanie podatku VAT do faktury.",
+        msg=_("Input VAT account is not configured (Polish Accounting "
+            "Settings). Skipping the VAT row on the invoice."),
         title="KSeF",
         indicator="orange"
     )
@@ -466,9 +467,9 @@ def register_from_ksef():
         # KSeF nie zwrócił jeszcze numeru dla tej faktury (opóźnienie po stronie KSeF) -
         # pomijamy, kolejne uruchomienie crona (zakres 30 dni) spróbuje ponownie.
         frappe.log_error(
-            "Otrzymano fakturę z KSeF bez przydzielonego numeru KSeF (ksefNumber) - "
-            "import pominięty, zostanie ponowiony przy kolejnym uruchomieniu.",
-            "KSeF - brak numeru faktury"
+            "Received a KSeF invoice without a KSeF number (ksefNumber) - "
+            "import skipped, it will be retried on the next run.",
+            "KSeF - missing invoice number"
         )
         continue
       purchase_invoice = frappe.get_all("Purchase Invoice",
@@ -508,13 +509,15 @@ def register_from_ksef():
         frappe.db.commit()
         new_invoice.add_comment(
             "Attachment",
-            f"Odebrano i dołączono fakturę zakupu: <a href='{file_doc.file_url}'>{file_doc.file_name}</a>"
+            _("Received and attached purchase invoice: <a href='{0}'>{1}</a>").format(
+                file_doc.file_url, file_doc.file_name
+            )
         )
         # Można odświeżyć pole _attachments (czasami pomaga w UI)
         new_invoice.set("__attachments", True)
         frappe.msgprint(
-            msg = f"Plik został dołączony jako załącznik.<br><b>{file_doc.file_name}</b>",
-            title = "Sukces",
+            msg = _("The file has been attached.<br><b>{0}</b>").format(file_doc.file_name),
+            title = _("Success"),
             indicator = "green"
         )
 
@@ -526,8 +529,8 @@ def register_from_ksef():
         }
         """
     except Exception as e:
-        frappe.log_error(frappe.get_traceback(), "Błąd pobierania KSeF")
-        frappe.throw(f"Nie udało się wygenerować / zapisać pliku faktury: {str(e)}")
+        frappe.log_error(frappe.get_traceback(), "KSeF fetch error")
+        frappe.throw(_("Failed to generate / save the invoice file: {0}").format(str(e)))
     finally:
       time.sleep(1)  # bezpieczny odstęp między wywołaniami
   return {
@@ -545,7 +548,7 @@ def check_sent_invoices_status():
   # Pobierz faktury, które zostały wysłane, ale nie mają jeszcze numeru KSeF
   pending_invoices = frappe.get_all("Sales Invoice",
                                     filters={
-                                      "ksef_status": "Wysłano",
+                                      "ksef_status": "Sent",
                                       "ksef_session_id": ["!=", None]
                                     },
                                     fields=["name", "ksef_reference_nr", "ksef_session_id"])
@@ -565,16 +568,16 @@ def check_sent_invoices_status():
             if ksef_inv.ksefNumber:
               doc = frappe.get_doc("Sales Invoice", inv.name)
               doc.db_set("ksef_numer", ksef_inv.ksefNumber)
-              doc.db_set("ksef_status", "Przyjęto")
+              doc.db_set("ksef_status", "Accepted")
               doc.db_set("ksef_data_wystawienia", ksef_inv.acquisitionDate) # invoicingDate
               doc.add_comment("Info",
-                            f"Faktura zaakceptowana przez KSeF. Numer: {ksef_inv.ksefNumber}")
+                            f"Invoice accepted by KSeF. Number: {ksef_inv.ksefNumber}")
               frappe.db.commit()
           elif ksef_inv.status.code >= 400:
-              frappe.get_doc("Sales Invoice", inv.name).db_set("ksef_status", "Błąd")
-              frappe.log_error(f"Błąd KSeF dla {inv.name}: {ksef_inv.status.description}",
+              frappe.get_doc("Sales Invoice", inv.name).db_set("ksef_status", "Error")
+              frappe.log_error(f"KSeF error for {inv.name}: {ksef_inv.status.description}",
                                "KSeF Status Error")
 
       except Exception as e:
-        frappe.log_error(f"Problem przy sprawdzaniu statusu {inv.name}: {str(e)}",
+        frappe.log_error(f"Problem while checking the status of {inv.name}: {str(e)}",
                          "KSeF Status Sync")

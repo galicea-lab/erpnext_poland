@@ -990,22 +990,22 @@ def generate_jpk_v7m(company: str, year: int, month: int,
     result=jpk_to_xml(jpk,True)
     # Dodaj informację o sukcesie
     result["success"] = True
-    result["message"] = _("JPK-V7M wygenerowany pomyślnie")
+    result["message"] = _("JPK-V7M generated successfully")
 
     return result
 
   except ValidationError as e:
-    frappe.log_error(f"Błąd walidacji JPK: {str(e)}")
+    frappe.log_error(f"JPK validation error: {str(e)}")
     return {
       "success": False,
-      "message": _("Błąd walidacji danych: {0}").format(str(e)),
+      "message": _("Data validation error: {0}").format(str(e)),
       "errors": e.errors()
     }
   except Exception as e:
-    frappe.log_error(f"Błąd generowania JPK: {str(e)}")
+    frappe.log_error(f"JPK generation error: {str(e)}")
     return {
       "success": False,
-      "message": _("Błąd generowania JPK: {0}").format(str(e))
+      "message": _("JPK generation error: {0}").format(str(e))
     }
 
 
@@ -1040,7 +1040,7 @@ def export_jpk_to_xml(company: str, year: int, month: int, przeniesienie : Decim
     return xml_data
 
   except Exception as e:
-    frappe.log_error(f"Błąd eksportu JPK do XML: {str(e)}")
+    frappe.log_error(f"JPK to XML export error: {str(e)}")
     raise
 
 
@@ -1077,10 +1077,10 @@ def test_generation1(company_name):
   xml_data = generator.export_to_xml(jpk)
 
   # Wyświetl wyniki
-  print("JPK wygenerowany pomyślnie")
-  print(f"Liczba wierszy sprzedaży: {len(jpk.ewidencja.sprzedaz_wiersze)}")
-  print(f"Liczba wierszy zakupów: {len(jpk.ewidencja.zakup_wiersze)}")
-  print(f"Podatek do zapłaty (P_38): {jpk.deklaracja.pozycje_szczegolowe.p_38}")
+  print("JPK generated successfully")
+  print(f"Sales rows: {len(jpk.ewidencja.sprzedaz_wiersze)}")
+  print(f"Purchase rows: {len(jpk.ewidencja.zakup_wiersze)}")
+  print(f"Tax payable (P_38): {jpk.deklaracja.pozycje_szczegolowe.p_38}")
 
   return jpk
 

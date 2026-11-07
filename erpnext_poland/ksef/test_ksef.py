@@ -14,7 +14,7 @@ os.chdir(BENCH_PATH)
 def ksef2send(invoice_name='FV/2026/07/00001'):
   try:
     company_name = frappe.defaults.get_user_default("Company")
-    print(f"Pobrano firmę: {company_name}")
+    print(f"Company fetched: {company_name}")
     company = frappe.get_doc("Company", company_name)
     from erpnext_poland.ksef_utils import  send_to_ksef
     send_to_ksef(invoice_name)

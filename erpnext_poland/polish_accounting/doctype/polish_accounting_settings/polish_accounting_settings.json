@@ -5,22 +5,22 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-   "section_break_9ew0",
-   "cert_pfx",
-   "cert_pass",
-   "api_url",
-   "nip",
-   "test_api_url",
-   "credit_to_usd",
-   "default_expense_account",
-   "item_code",
-   "description",
-   "ksef_items_mode",
-   "section_break_vat",
-   "vat_account_head",
-   "vat_cost_center",
-   "vat_description"
-  ],
+  "section_break_9ew0",
+  "cert_pfx",
+  "cert_pass",
+  "api_url",
+  "nip",
+  "test_api_url",
+  "credit_to_usd",
+  "default_expense_account",
+  "item_code",
+  "description",
+  "ksef_items_mode",
+  "section_break_vat",
+  "vat_account_head",
+  "vat_cost_center",
+  "vat_description"
+ ],
  "fields": [
   {
    "fieldname": "section_break_9ew0",
@@ -30,17 +30,17 @@
   {
    "fieldname": "cert_pfx",
    "fieldtype": "Attach",
-   "label": "cert_pfx"
+   "label": "Certificate (PFX)"
   },
   {
    "fieldname": "cert_pass",
    "fieldtype": "Password",
-   "label": "cert_pass"
+   "label": "Certificate password"
   },
   {
    "fieldname": "api_url",
    "fieldtype": "Data",
-   "label": "api_url"
+   "label": "API URL"
   },
   {
    "fieldname": "nip",
@@ -50,40 +50,40 @@
   {
    "fieldname": "test_api_url",
    "fieldtype": "Data",
-   "label": "test_api_url"
+   "label": "Test API URL"
   },
   {
-   "description": "Konto zobowi\u0105za\u0144 w USD",
+   "description": "USD liability account",
    "fieldname": "credit_to_usd",
    "fieldtype": "Data",
-   "label": "credit_to_usd"
+   "label": "USD Liability Account"
   },
   {
-   "description": "Domyślne konto kosztów/wydatków dla pozycji faktur w walucie USD, gdy pozycja nie ma ustawionego własnego konta",
+   "description": "Default cost/expense account for USD invoice items that have no account of their own",
    "fieldname": "default_expense_account",
    "fieldtype": "Link",
-   "label": "default_expense_account",
+   "label": "Default Expense Account",
    "options": "Account"
   },
   {
-   "description": "Kod asortymentu",
+   "description": "Item code",
    "fieldname": "item_code",
    "fieldtype": "Data",
-   "label": "item_code"
+   "label": "Item Code"
   },
   {
-   "description": "Opis",
+   "description": "Description",
    "fieldname": "description",
    "fieldtype": "Data",
-   "label": "description"
+   "label": "Description"
   },
   {
    "default": "KSeF-PENDING",
-   "description": "Spos\u00f3b wype\u0142niania pozycji faktury zakupu importowanej z KSeF",
+   "description": "How the items of a purchase invoice imported from KSeF are filled in",
    "fieldname": "ksef_items_mode",
    "fieldtype": "Select",
-   "label": "\u0179r\u00f3d\u0142o pozycji faktury zakupu",
-   "options": "KSeF-PENDING\nPoprzednia faktura dostawcy\nPozycje z formularza KSeF"
+   "label": "Purchase Invoice Item Source",
+   "options": "KSeF-PENDING\nPrevious supplier invoice\nKSeF form items"
   },
   {
    "fieldname": "section_break_vat",
@@ -91,32 +91,32 @@
    "label": "VAT"
   },
   {
-   "description": "Konto VAT naliczonego, na które trafi wiersz podatku VAT wstawiany do faktury zakupu importowanej z KSeF",
+   "description": "Input VAT account that receives the tax row inserted into a purchase invoice imported from KSeF",
    "fieldname": "vat_account_head",
    "fieldtype": "Link",
-   "label": "Konto VAT naliczonego",
+   "label": "Input VAT Account",
    "options": "Account"
   },
   {
-   "description": "Centrum kosztów przypisywane do wiersza podatku VAT",
+   "description": "Cost center assigned to the VAT tax row",
    "fieldname": "vat_cost_center",
    "fieldtype": "Link",
-   "label": "Centrum kosztów VAT",
+   "label": "VAT Cost Center",
    "options": "Cost Center"
   },
   {
    "default": "VAT naliczony",
-   "description": "Opis wiersza podatku VAT w tabeli Purchase Taxes and Charges",
+   "description": "Description of the VAT tax row in the Purchase Taxes and Charges table",
    "fieldname": "vat_description",
    "fieldtype": "Data",
-   "label": "Opis VAT"
+   "label": "VAT Description"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2026-09-25 12:00:00.000000",
+ "modified": "2026-11-07 08:10:00.000000",
  "modified_by": "Administrator",
  "module": "Polish Accounting",
  "name": "Polish Accounting Settings",

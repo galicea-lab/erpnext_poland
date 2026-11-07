@@ -32,45 +32,45 @@ def authenticate_with_certificate_ksef2(ksef_client: KSeFClient, certificate_pat
         )
 
         # Podpisz XML podpisem XAdES
-        print("2. Podpisywanie żądania XML...")
+        print("2. Signing the XML request...")
         signed_xml = sign_xades2(auth_request_xml, certificate_path, password)
 
         # Wyślij podpisany XML
-        print("3. Inicjowanie uwierzytelniania podpisem...")
+        print("3. Initiating certificate authentication...")
         init_response = ksef_client.auth_by_xades_signature(signed_xml)
-        print(f"   Numer referencyjny operacji: {init_response.referenceNumber}")
+        print(f"   Operation reference number: {init_response.referenceNumber}")
 
         temp_auth_token = init_response.authenticationToken.token
 
         # Sprawdzaj status operacji, aż do uzyskania statusu 200
-        print("4. Sprawdzanie statusu operacji (oczekiwanie na kod 200)...")
+        print("4. Checking the operation status (waiting for code 200)...")
         while True:
             status_response = ksef_client.auth_status(init_response.referenceNumber, temp_auth_token)
-            print(f"Aktualny status: {status_response.status.code} - {status_response.status.description}")
+            print(f"Current status: {status_response.status.code} - {status_response.status.description}")
             if status_response.status.code == 200:
                 break
             elif status_response.status.code >= 400:
-                print(f"Uwierzytelnienie nie powiodło się. Powód: {status_response.status.description}")
+                print(f"Authentication failed. Reason: {status_response.status.description}")
                 return None
 
             time.sleep(2)
 
         # Tokeny dostępowe
-        print("5. Uwierzytelnianie zakończone. Pobranie tokenów sesji...")
+        print("5. Authentication finished. Fetching session tokens...")
         tokens = ksef_client.redeem_token(temp_auth_token)
 
         # Ustaw główny token dostępu w kliencie
         ksef_client.set_access_token(tokens.accessToken.token)
-        print("Tokeny pobrane.")
+        print("Tokens retrieved.")
 
         return tokens
 
     except requests.exceptions.HTTPError as e:
-        print(f"Wystąpił błąd HTTP: {e.response.status_code}")
-        print(f"Treść odpowiedzi: {e.response.text}")
+        print(f"HTTP error: {e.response.status_code}")
+        print(f"Response body: {e.response.text}")
         return None
     except Exception as e:
-        print(f"Wystąpił nieoczekiwany błąd: {e}")
+        print(f"Unexpected error: {e}")
         return None
 
 def get_mf_public_key(ksef_client: KSeFClient, usage: str = "SymmetricKeyEncryption") -> str:
@@ -82,9 +82,9 @@ def get_mf_public_key(ksef_client: KSeFClient, usage: str = "SymmetricKeyEncrypt
             if usage == u.value:
                 der_cert = base64.b64decode(key.certificate)
                 return convert_der_to_pem(der_cert)
-        raise Exception(f"Nie znaleziono klucza publicznego dla użycia: {usage}")
+        raise Exception(f"No public key found for usage: {usage}")
     except Exception as e:
-        raise Exception(f"Błąd pobierania klucza publicznego MF: {e}")
+        raise Exception(f"Error fetching the MF public key: {e}")
 
 def convert_der_to_pem(der_data: bytes) -> str:
     # Konwertuje certyfikat z formatu DER do PEM.
@@ -169,38 +169,38 @@ def authenticate_with_certificate_ksef2(ksef_client: KSeFClient, certificate_pat
             identifier_value=nip
         )
 
-        print("2. Podpisywanie żądania XML...")
+        print("2. Signing the XML request...")
         signed_xml = sign_xades2(auth_request_xml, certificate_path, password)
 
-        print("3. Inicjowanie uwierzytelniania podpisem...")
+        print("3. Initiating certificate authentication...")
         init_response = ksef_client.auth_by_xades_signature(signed_xml)
-        print(f"   Numer referencyjny operacji: {init_response.referenceNumber}")
+        print(f"   Operation reference number: {init_response.referenceNumber}")
 
         temp_auth_token = init_response.authenticationToken.token
 
-        print("4. Sprawdzanie statusu operacji (oczekiwanie na kod 200)...")
+        print("4. Checking the operation status (waiting for code 200)...")
         while True:
             status_response = ksef_client.auth_status(init_response.referenceNumber, temp_auth_token)
-            print(f"Aktualny status: {status_response.status.code} - {status_response.status.description}")
+            print(f"Current status: {status_response.status.code} - {status_response.status.description}")
             if status_response.status.code == 200:
                 break
             elif status_response.status.code >= 400:
-                print(f"Uwierzytelnienie nie powiodło się. Powód: {status_response.status.description}")
+                print(f"Authentication failed. Reason: {status_response.status.description}")
                 return None
             time.sleep(2)
 
-        print("5. Uwierzytelnianie zakończone. Pobranie tokenów sesji...")
+        print("5. Authentication finished. Fetching session tokens...")
         tokens = ksef_client.redeem_token(temp_auth_token)
         ksef_client.set_access_token(tokens.accessToken.token)
-        print("Tokeny pobrane.")
+        print("Tokens retrieved.")
         return tokens
 
     except requests.exceptions.HTTPError as e:
-        print(f"Wystąpił błąd HTTP: {e.response.status_code}")
-        print(f"Treść odpowiedzi: {e.response.text}")
+        print(f"HTTP error: {e.response.status_code}")
+        print(f"Response body: {e.response.text}")
         return None
     except Exception as e:
-        print(f"Wystąpił nieoczekiwany błąd: {e}")
+        print(f"Unexpected error: {e}")
         return None
 
 
@@ -212,9 +212,9 @@ def get_mf_public_key(ksef_client: KSeFClient, usage: str = "SymmetricKeyEncrypt
                 if usage == u.value:
                     der_cert = base64.b64decode(key.certificate)
                     return convert_der_to_pem(der_cert)
-        raise Exception(f"Nie znaleziono klucza publicznego dla użycia: {usage}")
+        raise Exception(f"No public key found for usage: {usage}")
     except Exception as e:
-        raise Exception(f"Błąd pobierania klucza publicznego MF: {e}")
+        raise Exception(f"Error fetching the MF public key: {e}")
 
 
 def convert_der_to_pem(der_data: bytes) -> str:
@@ -254,7 +254,7 @@ def ksef2_send_invoice_in_session(ksef_client: KSeFClient, session_ref: str, inv
 
 def list_incoming_invoices(ksef_client: KSeFClient, days_back: int = 30):
     """Pobiera listę faktur zakupowych (Subject2) z ostatnich X dni."""
-    print(f"\n--- Pobieranie listy faktur przychodzących (ostatnie {days_back} dni) ---")
+    print(f"\n--- Fetching incoming invoices (last {days_back} days) ---")
 
     end_date = datetime.now(timezone.utc)
     start_date = end_date - timedelta(days=days_back)
@@ -276,8 +276,8 @@ def list_incoming_invoices(ksef_client: KSeFClient, days_back: int = 30):
         # W produkcji należy obsłużyć pętlę while response.hasMore:
         response = ksef_client.query_invoices_metadata(query_filters, page_size=100)
 
-        print(f"Znaleziono faktur: {len(response.invoices)}")
-        print(f"{'Data przyjęcia':<25} | {'Numer KSeF':<35} | {'Sprzedawca (NIP)':<15} | {'Kwota Brutto'}")
+        print(f"Invoices found: {len(response.invoices)}")
+        print(f"{'Received':<25} | {'KSeF number':<35} | {'Seller (NIP)':<15} | {'Gross amount'}")
         print("-" * 100)
 
         for inv in response.invoices:
@@ -286,7 +286,7 @@ def list_incoming_invoices(ksef_client: KSeFClient, days_back: int = 30):
         return response.invoices
 
     except Exception as e:
-        print(f"Błąd podczas pobierania listy faktur: {e}")
+        print(f"Error while fetching the invoice list: {e}")
         return []
 
 
@@ -301,10 +301,10 @@ def download_invoice_xml(ksef_client: KSeFClient, ksef_number: str, output_dir: 
         with open(filename, "wb") as f:
             f.write(xml_content)
 
-        print(f"Sukces! Faktura zapisana jako: {filename}")
+        print(f"Success! Invoice saved as: {filename}")
         return filename
     except Exception as e:
-        print(f"Błąd pobierania faktury: {e}")
+        print(f"Error fetching the invoice: {e}")
         return None
 
 
@@ -323,35 +323,35 @@ def test_send_invoice_flow(nip: str, invoice_path: str, certificate_path : str, 
     if not tokens:
         return
 
-    print("\n--- Krok 2: Pobieranie klucza publicznego MF ---")
+    print("\n--- Step 2: Fetching the MF public key ---")
     try:
         public_key = get_mf_public_key(ksef, "SymmetricKeyEncryption")
-        print("   Klucz publiczny pobrany pomyślnie.")
+        print("   Public key fetched successfully.")
     except Exception as e:
-        print(f"   Błąd pobierania klucza: {e}")
+        print(f"   Error fetching the key: {e}")
         return
 
     session_ref = None
     try:
-        print("\n--- Krok 3: Otwieranie sesji interaktywnej ---")
+        print("\n--- Step 3: Opening the interactive session ---")
         session_response, sym_key, iv = ksef2_open_online_session(ksef, public_key)
         session_ref = session_response.referenceNumber
-        print(f"   Sesja otwarta, numer referencyjny: {session_ref}")
+        print(f"   Session opened, reference number: {session_ref}")
 
-        print("\n--- Krok 4: Wysyłanie faktury ---")
+        print("\n--- Step 4: Sending the invoice ---")
         with open(invoice_path, "rb") as f:
             invoice_data = f.read()
 
         send_response = ksef2_send_invoice_in_session(ksef, session_ref, invoice_data, sym_key, iv)
-        print(f"   Faktura wysłana, numer referencyjny faktury: {send_response.referenceNumber}")
+        print(f"   Invoice sent, invoice reference number: {send_response.referenceNumber}")
 
     except Exception as e:
-        print(f"   Wystąpił błąd podczas wysyłki: {e}")
+        print(f"   An error occurred while sending: {e}")
     finally:
         if session_ref:
-            print("\n--- Krok 5: Zamykanie sesji ---")
+            print("\n--- Step 5: Closing the session ---")
             ksef.online_session_terminate(session_ref)
-            print("   Sesja została zamknięta.")
+            print("   The session has been closed.")
 
 
 
@@ -359,23 +359,23 @@ def sign_auth_file(ksef_client: KSeFClient, certificate_path: str, password: str
     try:
         xml=open(fn).read()
         # Podpisz XML podpisem XAdES
-        print("Podpisywanie żądania XML...")
+        print("Signing the XML request...")
         signed_xml = sign_xades2(xml, certificate_path, password)
         xades=open(fn+'.xades','bw+')
         xades.write(signed_xml)
         xades.close()
     except Exception as e:
-        print(f"Wystąpił nieoczekiwany błąd: {e}")
+        print(f"Unexpected error: {e}")
         return None
 
 if __name__ == "__main__":
     settings = get_accounting_settings()
-    parser = argparse.ArgumentParser(description='Testowanie klienta KSeF 2.0')
-    parser.add_argument('cmd', choices=['login', 'send', 'inbox', 'download', 'sign'], help='Operacja do wykonania.')
-    parser.add_argument('--nip', help='NIP podatnika (wymagany przy login/inbox).', default=settings.ksef2.nip)
-    parser.add_argument('--file', help='Ścieżka do pliku (dla send).')
-    parser.add_argument('--ksef-num', help='Numer KSeF faktury (dla download).')
-    parser.add_argument('--days', type=int, default=30, help='Ile dni wstecz szukać faktur (dla inbox).')
+    parser = argparse.ArgumentParser(description='KSeF 2.0 client test')
+    parser.add_argument('cmd', choices=['login', 'send', 'inbox', 'download', 'sign'], help='Operation to perform.')
+    parser.add_argument('--nip', help='Taxpayer NIP (required for login/inbox).', default=settings.ksef2.nip)
+    parser.add_argument('--file', help='Path to the file (for send).')
+    parser.add_argument('--ksef-num', help='KSeF invoice number (for download).')
+    parser.add_argument('--days', type=int, default=30, help='How many days back to look for invoices (for inbox).')
 
     args = parser.parse_args()
 

@@ -60,7 +60,7 @@ def sign_auth_request_with_xmlsec(xml_input: Union[bytes, str], pfx_path: str, p
     pfx_data = open(pfx_path, "rb").read()
     private_key, cert, additional = pkcs12.load_key_and_certificates(pfx_data, pfx_password.encode())
     if cert is None:
-        raise ValueError("Nie udało się odczytać certyfikatu z PFX")
+        raise ValueError("Failed to read the certificate from the PFX file")
 
     # Zbuduj XAdES QualifyingProperties
     qprops = _build_qualifying_properties_xml(cert, signature_id="Signature", signed_props_id="SignedProperties")
